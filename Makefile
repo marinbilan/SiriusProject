@@ -6,7 +6,9 @@ marinTatFiles = main.o \
 
 # ---- ----
 allDirs = -I sw/Reactor/if \
-		  -I sw/Reactor/inc
+		  -I sw/Reactor/inc \
+		  -I sw/Mayers/if \
+		  -I sw/Mayers/inc \
 
 allPreReq = main.o \
 		    EventHandler.o \
@@ -47,8 +49,8 @@ gmock = -lgmock
 gmock_main = -lgmock_main
 
 # test sources
-test_sources = sw/Reactor/src/EventHandler.cpp \
-               sw/UnitTest/testEventHandler.cpp \
+test_sources = sw/Mayers/src/Mayers.cpp \
+               sw/UnitTest/testMayers.cpp \
 
 unitTest:
 	g++ $(CXXFLAGS) \

@@ -1,7 +1,8 @@
 #include <gmock/gmock.h>
 #include "gtest/gtest.h"
+#include <memory>
 
-#include "EventHandler.h"
+#include "Mayers.h"
 
 // Important!
 using ::testing::_;
@@ -16,6 +17,7 @@ public:
     // Before Each Test
     void SetUp()
     {
+        p = std::make_unique<Mayers::Mayers>(42);
 
     }
     // After Each Test
@@ -23,10 +25,13 @@ public:
     {
 
     }
+
+std::unique_ptr<Mayers::MayersIf> p;
 };
 
 
 TEST_F(EventHandlerTest, test0) 
 { 
-
+    p->toString();
+    p->testItem10_0();
 }
