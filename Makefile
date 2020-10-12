@@ -1,26 +1,31 @@
 CXXFLAGS = -g -no-pie -std=c++14
 
-# Files
-marinTatFiles = main.o \
-				test.o \
 
-# ---- ----
-allDirs = -I sw/Reactor/if \
-		  -I sw/Reactor/inc \
+# ---- Dirs ----
+allDirs = -I sw/Common/if \
+		  -I sw/Common/inc \
 		  -I sw/Mayers/if \
 		  -I sw/Mayers/inc \
+		  -I sw/Reactor/if \
+		  -I sw/Reactor/inc \
 
 allPreReq = main.o \
+			Database.o \
 		    EventHandler.o \
 
 # target: prerequisites ...
 #     recipe
-myTarget: $(allPreReq)
-	g++ $(allPreReq) -o projectX
+Sirius: $(allPreReq)
+	g++ $(allPreReq) -o projectSirius
 
 main.o: sw/main.cpp
 	g++ -c $(allDirs) sw/main.cpp
+# Common
+Database.o: sw/Common/src/Database.cpp
+	g++ -c $(allDirs) sw/Common/src/Database.cpp
+# Mayers
 
+# Reactor
 EventHandler.o: sw/Reactor/src/EventHandler.cpp
 	g++ -c $(allDirs) sw/Reactor/src/EventHandler.cpp
 
@@ -66,4 +71,4 @@ unitTest:
 
 # Clean
 clean:
-	rm *.o marinTar projectX gmockTest
+	rm *.o projectSirius gmockTest
