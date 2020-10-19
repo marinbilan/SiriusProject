@@ -5,29 +5,32 @@
 #include <memory>  
 #include <vector>  
 
-// #include "database.h"
+#include "Database.h"
+#include "ControlIf.h"
+#include "Control.h"
 
-// Map in class members (ClassName, constructorPtr(const str&, const str&)
-// Register class in map with registerClassNew method
-#define REGISTER_CLASS_NEW(ConstructorName) Common::Factory::getInstance().registerClassNew<ConstructorName>(#ConstructorName)
+// Map in class members (ClassName, constructorPtr(const str&, const str&))
+// Register class in map with registerClass method
+#define REGISTER_CLASS(ConstructorName) Common::Factory::getInstance().registerClass<ConstructorName>(#ConstructorName)
 
 /*
 Factory:
+[1st STEP]
 Class Registration
 - Class registration (insert in map)
+
+[2nd STEP]
 Object Creation
-- Create object (find in map and create instance)
-Other
-- Error, Log, Database
+- Create object out of map (find in map and create instance)
 */
 
 namespace Common
 {
-/*! @brief Method for object construction
-*   @param objectName Name (ID) of particaular instance
+/*! @brief  Method for object construction
+*   @param  objectName Name (ID) of particaular instance
 *   @return void pointer on particular created object
 */
-// - Constructor type (const str&, const str&)
+// Constructor type (const str&, const str&)
 // arg0 - instanceDbPath (without instance name)
 // arg1 - instanceName
 template <class T> void* constructorNew(const std::string& arg0, const std::string& arg1)
@@ -38,7 +41,7 @@ template <class T> void* constructorNew(const std::string& arg0, const std::stri
 class Factory
 {
 public:
-	/*! @brief Get singleton factory instance
+	/*! @brief  Get singleton factory instance
 	*   @return Factory reference 
 	*/
 	static Factory& getInstance()
@@ -58,9 +61,9 @@ public:
 	*/
 	// - ConstructorName (ex: Model::StaticModel) 
 	template <class T>
-	void registerClassNew(std::string const& constructorName)
+	void registerClass(std::string const& constructorName)
 	{
-		m_classesMapNew.insert(std::make_pair(constructorName, &constructorNew<T>));
+		m_classesMap.insert(std::make_pair(constructorName, &constructorNew<T>));
 	}
 	/*! @brief Method for object creation
 	*   @param constructorName Namespace::constructorName
@@ -68,10 +71,10 @@ public:
 	*   @return void
 	*/
 	// - Find constructor pointer with constructorName and create object using that constructor pointer
-	void* constructObjectNew(std::string const& constructorName, const std::string& arg0, const std::string& arg1)
+	void* constructObject(std::string const& constructorName, const std::string& arg0, const std::string& arg1)
 	{
-		mapTypeNew::iterator i = m_classesMapNew.find(constructorName);
-		if (i == m_classesMapNew.end()) return 0; // or throw or whatever you want  
+		mapTypeNew::iterator i = m_classesMap.find(constructorName);
+		if (i == m_classesMap.end()) return 0; // or throw or whatever you want  
 		return i->second(arg0, arg1);
 	}
 
@@ -96,19 +99,19 @@ public:
 	*   @param database
 	*   @return void
 	*/
-	/*void setDatabase(std::unique_ptr<Common::Database>& database)
+	void setDatabase(std::unique_ptr<Common::Database>& database)
 	{
 		m_database = std::move(database);
-	}*/
+	}
 
 
 	/*! @brief Get reference on global database object
      *  @return reference on database object
      */
-	/*std::unique_ptr<Common::Database>& getDatabase()
+	std::unique_ptr<Common::Database>& getDatabase()
 	{
 		return m_database;
-	}*/
+	}
 
 
 	/*! @brief Get reference on global error object
@@ -136,7 +139,7 @@ public:
 	void registerClass()
 	{
 		// ControlIf
-		// REGISTER_CLASS_NEW(Control::ControlDefault);
+		REGISTER_CLASS(Control::Control);
 	}
 
 
@@ -157,10 +160,12 @@ public:
 		std::string clusters("clusters");
 		std::vector<std::string> vecOfClustersStrings;
 
-		// DB: clusters    string    controls cameras lights loaders models shaders ...
-		// FACTORY.getDatabase()->getStringsFromDB(clusters, vecOfClustersStrings);
+		// DB: clusters    string    controls...
+        m_database->getStringsFromDB(clusters, vecOfClustersStrings);
+
 		for (auto s : vecOfClustersStrings)
 		{
+            std::cout << "xxx clusters: " << s << '\n';
 			createModels(s);
 		}
 	}
@@ -171,7 +176,7 @@ public:
 		std::vector<std::string> vecOfModelsStrings;
 
 		// DB ex: models    string    staticModel terrainModel ...
-		// FACTORY.getDatabase()->getStringsFromDB(dbPath1, vecOfModelsStrings);
+        m_database->getStringsFromDB(dbPath1, vecOfModelsStrings);
 
 		for (auto s : vecOfModelsStrings)
 		{
@@ -181,12 +186,12 @@ public:
 			std::string constructorNameDbPath = dbPath1 + "_" + s + "_" + "constructorName";
 			std::vector<std::string> vecOfConstructorString;
 			// ex vecOfConstructorString[0]: "Model::StaticModel"
-			// FACTORY.getDatabase()->getStringsFromDB(constructorNameDbPath, vecOfConstructorString);
+            m_database->getStringsFromDB(constructorNameDbPath, vecOfConstructorString);
 
 			std::string instanceNameDbPath = dbPath1 + "_" + s + "_" + "instanceNames";
 			std::vector<std::string> vecOfInstanceString;
 			// ex vecOfInstanceString: "vanquish"
-			// FACTORY.getDatabase()->getStringsFromDB(instanceNameDbPath, vecOfInstanceString);
+            m_database->getStringsFromDB(instanceNameDbPath, vecOfInstanceString);
 
 			// Create each instance
 			// ex: vanquish ...
@@ -194,10 +199,10 @@ public:
 			{
 				if (!dbPath1.compare("controls"))
 				{
-					// std::shared_ptr<Control::ControlIf> control((Control::ControlIf*)constructObjectNew(vecOfConstructorString[0], instanceDbPath, s));
-					// control->preInitialization();
+					std::shared_ptr<Control::ControlIf> control((Control::ControlIf*)constructObject(vecOfConstructorString[0], instanceDbPath, s));
+					control->preInitialization();
 
-					// storeInContainer("ControlIf", control); 
+					storeInContainer("ControlIf", control); 
 					std::cout << ".";
 				}
 				else 
@@ -214,7 +219,7 @@ public:
 	void showMeSeededClasses()
 	{
 		mapTypeNew::iterator it;
-		for (it = m_classesMapNew.begin(); it != m_classesMapNew.end(); ++it)
+		for (it = m_classesMap.begin(); it != m_classesMap.end(); ++it)
 		{
 			std::cout << " - " << it->first << "\n";
 		}
@@ -266,7 +271,7 @@ public:
 	{
 		if (!objNameIf.compare("ControlIf"))
 		{
-			// m_vecOfControlIf.push_back(std::dynamic_pointer_cast<Control::ControlIf>(derivedObject));
+			m_vecOfControlIf.push_back(std::dynamic_pointer_cast<Control::ControlIf>(derivedObject));
 		}
 		else
 		{
@@ -320,10 +325,10 @@ private:
 	// - Create map(ConstructorName, constructorPtr) constructorPtr(str, str)
 	typedef void* (*constructor_NEW)(const std::string&, const std::string&);
 	typedef std::map<std::string, constructor_NEW> mapTypeNew;
-	mapTypeNew m_classesMapNew;
+	mapTypeNew m_classesMap;
 
 	// DataBase
-	// std::unique_ptr<Common::Database> m_database;
+	std::unique_ptr<Common::Database> m_database;
 	// Error
 	// std::unique_ptr<Common::Error> m_error;
 	// Log
@@ -331,7 +336,7 @@ private:
 
 
 	// Container Stuff
-	// std::vector<std::shared_ptr<Control::ControlIf>>     m_vecOfControlIf;
+	std::vector<std::shared_ptr<Control::ControlIf>>     m_vecOfControlIf;
 
 };
 } // End of namespace

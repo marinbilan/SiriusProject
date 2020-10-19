@@ -1,0 +1,22 @@
+// Serious Engine
+
+/---------------------------------------------------------------
+ |  0th STAGE of creation - Interfaces
+---------------------------------------------------------------/
+clusters    string    controls
+
+
+======================= IF DERIVED CLASSES =====================
+/---------------------------------------------------------------
+ |  1st STAGE of clusters creation - Derived classes from If
+---------------------------------------------------------------/
+controls      string    control
+
+
+/---------------------------------------------------------------
+ |  2st STAGE of clusters creation 
+ |  Constructors names and Instances names
+---------------------------------------------------------------/
+[CONTROLS]
+controls_control_constructorName    string    Control::Control
+controls_control_instanceNames      string    control_0

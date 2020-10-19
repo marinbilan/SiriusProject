@@ -8,10 +8,13 @@ allDirs = -I sw/Common/if \
 		  -I sw/Mayers/inc \
 		  -I sw/Reactor/if \
 		  -I sw/Reactor/inc \
+		  -I sw/Services/if \
+		  -I sw/Services/inc \
 
 allPreReq = main.o \
 			Database.o \
 		    EventHandler.o \
+		    Control.o \
 
 # target: prerequisites ...
 #     recipe
@@ -28,6 +31,10 @@ Database.o: sw/Common/src/Database.cpp
 # Reactor
 EventHandler.o: sw/Reactor/src/EventHandler.cpp
 	g++ -c $(allDirs) sw/Reactor/src/EventHandler.cpp
+
+# Services
+Control.o: sw/Services/src/Control.cpp
+	g++ -c $(allDirs) sw/Services/src/Control.cpp
 
 # ---------
 # UNIT TEST
