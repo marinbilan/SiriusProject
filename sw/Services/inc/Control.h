@@ -19,6 +19,10 @@ public:
 	void preInitialization();
 	void postInitialization();
 
+    // cmd handling
+	void dump();
+	void cmdPrompt(const std::string& arg0);
+
 private:
 std::string m_dbPath;
 std::string m_dbPathWithName;

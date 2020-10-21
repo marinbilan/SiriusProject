@@ -1,21 +1,23 @@
-// Serious Engine
+// Sirius Engine v1.0
 
 /---------------------------------------------------------------
- |  0th STAGE of creation - Interfaces
+ |  0th STAGE of creation
+ |  INTERFACEs
 ---------------------------------------------------------------/
 clusters    string    controls
 
 
 ======================= IF DERIVED CLASSES =====================
 /---------------------------------------------------------------
- |  1st STAGE of clusters creation - Derived classes from If
+ |  1st STAGE of clusters creation - 
+ |  DERIVED CLASSES FROM INTERFACEs
 ---------------------------------------------------------------/
 controls      string    control
 
 
 /---------------------------------------------------------------
  |  2st STAGE of clusters creation 
- |  Constructors names and Instances names
+ |  CONSTRUCTORs NAMES AND INSTANCEs NAMES
 ---------------------------------------------------------------/
 [CONTROLS]
 controls_control_constructorName    string    Control::Control

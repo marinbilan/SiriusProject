@@ -17,7 +17,7 @@
 Factory:
 [1st STEP]
 Class Registration
-- Class registration (insert in map)
+- Class registration (insert constructor pointer in map)
 
 [2nd STEP]
 Object Creation
@@ -55,7 +55,7 @@ public:
 	Factory(Factory const&) = delete;
 	void operator=(Factory const&) = delete;
 
-	/*! @brief Method for class registration - map(constructor name, constructor pointer)
+	/*! @brief Method for class registration - map(constructor name, constructor (function) pointer)
 	*   @param constructorName Namespace::constructorName
 	*   @return void
 	*/
@@ -199,10 +199,10 @@ public:
 			{
 				if (!dbPath1.compare("controls"))
 				{
-					std::shared_ptr<Control::ControlIf> control((Control::ControlIf*)constructObject(vecOfConstructorString[0], instanceDbPath, s));
-					control->preInitialization();
+					std::shared_ptr<Control::ControlIf> controlInstance((Control::ControlIf*)constructObject(vecOfConstructorString[0], instanceDbPath, s));
+					controlInstance->preInitialization();
 
-					storeInContainer("ControlIf", control); 
+					storeInContainer("ControlIf", controlInstance); 
 					std::cout << ".";
 				}
 				else 
@@ -287,11 +287,11 @@ public:
 	 *  @return void
 	 */
 	// -- Get Controls via Interface --
-/*	std::vector<std::shared_ptr<Control::ControlIf>>& getControlIfVec()
+	std::vector<std::shared_ptr<Control::ControlIf>>& getControlIfVec()
 	{
 		return m_vecOfControlIf;
 	}
-	std::shared_ptr<Control::ControlIf>& getControlIf(const std::string& arg0)
+	/*std::shared_ptr<Control::ControlIf>& getControlIf(const std::string& arg0)
 	{
 		return getObjectFromVec(m_vecOfControlIf, arg0);
 	}*/

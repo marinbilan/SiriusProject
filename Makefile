@@ -12,8 +12,10 @@ allDirs = -I sw/Common/if \
 		  -I sw/Services/inc \
 
 allPreReq = main.o \
+			CmdPrompt.o \
 			Database.o \
 		    EventHandler.o \
+			LoggingAcceptor.o \
 		    Control.o \
 
 # target: prerequisites ...
@@ -24,6 +26,9 @@ Sirius: $(allPreReq)
 main.o: sw/main.cpp
 	g++ -c $(allDirs) sw/main.cpp
 # Common
+CmdPrompt.o: sw/Common/src/CmdPrompt.cpp
+	g++ -c $(allDirs) sw/Common/src/CmdPrompt.cpp
+
 Database.o: sw/Common/src/Database.cpp
 	g++ -c $(allDirs) sw/Common/src/Database.cpp
 # Mayers
@@ -31,10 +36,16 @@ Database.o: sw/Common/src/Database.cpp
 # Reactor
 EventHandler.o: sw/Reactor/src/EventHandler.cpp
 	g++ -c $(allDirs) sw/Reactor/src/EventHandler.cpp
+LoggingAcceptor.o: sw/Reactor/src/LoggingAcceptor.cpp
+	g++ -c $(allDirs) sw/Reactor/src/LoggingAcceptor.cpp
 
 # Services
 Control.o: sw/Services/src/Control.cpp
 	g++ -c $(allDirs) sw/Services/src/Control.cpp
+
+
+
+
 
 # ---------
 # UNIT TEST
