@@ -14,6 +14,7 @@ allDirs = -I sw/Common/if \
 allPreReq = main.o \
 			CmdPrompt.o \
 			Database.o \
+			Log.o \
 		    EventHandler.o \
 			LoggingAcceptor.o \
 		    Control.o \
@@ -28,9 +29,10 @@ main.o: sw/main.cpp
 # Common
 CmdPrompt.o: sw/Common/src/CmdPrompt.cpp
 	g++ -c $(allDirs) sw/Common/src/CmdPrompt.cpp
-
 Database.o: sw/Common/src/Database.cpp
 	g++ -c $(allDirs) sw/Common/src/Database.cpp
+Log.o: sw/Common/src/Log.cpp
+	g++ -c $(allDirs) sw/Common/src/Log.cpp
 # Mayers
 
 # Reactor

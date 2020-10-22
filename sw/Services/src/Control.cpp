@@ -12,6 +12,8 @@ Control::Control::Control(const std::string& dbPath, const std::string& name) :
 */
 	m_dbPathWithName = m_dbPath + m_name + "_";
 	std::cout << " CREATION INSTANCE - m_dbPathWithName: " << m_dbPathWithName << " modelName: " << m_name << '\n';
+
+	FACTORY.getLog()->LOGFILE(LOG "Control: " + m_name + " created. [CONSTRUCTOR]");
 }
 
 

@@ -18,20 +18,15 @@
 
 int main()
 {
-    std::cout << "Hello World from projectX!" << "\n";
+    // std::cout << "Hello World from projectX!" << "\n";
 
     // REACTOR
-    // std::unique_ptr<Reactor::EventHandlerIf> p = std::make_unique<Reactor::EventHandler>(11);
-    // std::cout << "clientId: " << p->getClientId() << "\n";
+    /*
 	Reactor::Logging_Acceptor la(0);
 
     Reactor::InitiationDispatcher::getInstance().init();
     Reactor::InitiationDispatcher::getInstance().handle_events();
-
-
-    // DATABASE - Create DB and store it in Factory
-	std::unique_ptr<Common::Database> database = std::make_unique<Common::Database>("sw/_DB/database_0.txt");
-	Common::Factory::getInstance().setDatabase(database);
+    */
 
     // FACTORY
     Common::Factory::Factory::getInstance().preInit();

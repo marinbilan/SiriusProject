@@ -5,7 +5,10 @@
 #include <memory>  
 #include <vector>  
 
+// Common
 #include "Database.h"
+#include "Log.h"
+
 #include "ControlIf.h"
 #include "Control.h"
 
@@ -81,10 +84,16 @@ public:
 	void preInit()
 	{
         std::cout << "Factory preinit method called!" << '\n';
+
+		// DATABASE - Create DB and store it in Factory
+		std::unique_ptr<Common::Database> database = std::make_unique<Common::Database>("sw/_DB/database_0.txt");
+		Common::Factory::getInstance().setDatabase(database);
+
 		// Create global Error object
 		// m_error = std::make_unique<Common::Error>();
+
 		// Create global Log object
-		// m_log = std::make_unique<Common::Log>("log_0");
+		m_log = std::make_unique<Common::Log>("log_0");
 
 		registerClass();
 	}
@@ -127,10 +136,10 @@ public:
 	 *  @param -
 	 *  @return reference on log object
 	 */
-	/*std::unique_ptr<Common::Log>& getLog()
+	std::unique_ptr<Common::Log>& getLog()
 	{
 		return m_log;
-	}*/
+	}
 
 
 	/*! @brief Register class using MACRO - Generator of objects
@@ -149,55 +158,57 @@ public:
 	void createObjects()
 	{
 		std::cout << " [CREATING OBJECTs] ";
-		createAllClusters();
+		createAllObjects();
 
 		std::cout << '\n';
 	}
 
 
-	void createAllClusters()
+	void createAllObjects()
 	{
-		std::string clusters("clusters");
-		std::vector<std::string> vecOfClustersStrings;
+		std::string interfaces("interfaces");
+		std::vector<std::string> vecOfInterfacesStrings;
 
-		// DB: clusters    string    controls...
-        m_database->getStringsFromDB(clusters, vecOfClustersStrings);
+        // INTERFACEs
+		// [0th DB Stage]: interfaces    string    controls ...
+        m_database->getStringsFromDB(interfaces, vecOfInterfacesStrings);
 
-		for (auto s : vecOfClustersStrings)
+		for (auto s : vecOfInterfacesStrings)
 		{
-            std::cout << "xxx clusters: " << s << '\n';
+            // std::cout << "xxx interfaces: " << s << '\n';
 			createModels(s);
 		}
 	}
 
-	void createModels(const std::string& cluster)
+	void createModels(const std::string& interface)
 	{   
-		std::string dbPath1 = cluster;
+		std::string interfacePath = interface;
 		std::vector<std::string> vecOfModelsStrings;
 
-		// DB ex: models    string    staticModel terrainModel ...
-        m_database->getStringsFromDB(dbPath1, vecOfModelsStrings);
+        // DERIVED CLASSEs
+		// [1th DB Stage]: controls    string    control ...
+        m_database->getStringsFromDB(interfacePath, vecOfModelsStrings);
 
 		for (auto s : vecOfModelsStrings)
 		{
-			// dB ex: instanceDbPath: "models_staticModel_"
-			std::string instanceDbPath = dbPath1 + "_" + s + "_"; // arg0 of constructor - Instance dB locator
+			// dB ex: instanceDbPath: "controls_control_"
+			std::string instanceDbPath = interfacePath + "_" + s + "_"; // arg0 of constructor - Instance dB locator
 
-			std::string constructorNameDbPath = dbPath1 + "_" + s + "_" + "constructorName";
+			std::string constructorNameDbPath = interfacePath + "_" + s + "_" + "constructorName";
 			std::vector<std::string> vecOfConstructorString;
-			// ex vecOfConstructorString[0]: "Model::StaticModel"
+			// ex vecOfConstructorString[0]: "Control::Control"
             m_database->getStringsFromDB(constructorNameDbPath, vecOfConstructorString);
 
-			std::string instanceNameDbPath = dbPath1 + "_" + s + "_" + "instanceNames";
+			std::string instanceNameDbPath = interfacePath + "_" + s + "_" + "instanceNames";
 			std::vector<std::string> vecOfInstanceString;
-			// ex vecOfInstanceString: "vanquish"
+			// ex vecOfInstanceString: "control_0"
             m_database->getStringsFromDB(instanceNameDbPath, vecOfInstanceString);
 
 			// Create each instance
-			// ex: vanquish ...
+			// ex: control_0 ...
 			for (auto s : vecOfInstanceString)
 			{
-				if (!dbPath1.compare("controls"))
+				if (!interfacePath.compare("controls"))
 				{
 					std::shared_ptr<Control::ControlIf> controlInstance((Control::ControlIf*)constructObject(vecOfConstructorString[0], instanceDbPath, s));
 					controlInstance->preInitialization();
@@ -332,7 +343,7 @@ private:
 	// Error
 	// std::unique_ptr<Common::Error> m_error;
 	// Log
-	// std::unique_ptr<Common::Log> m_log;
+	std::unique_ptr<Common::Log> m_log;
 
 
 	// Container Stuff

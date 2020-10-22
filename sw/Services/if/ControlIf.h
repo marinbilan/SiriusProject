@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
-
+#include "CommonTypes.h"
+#include "Log.h"
 
 namespace Control
 {

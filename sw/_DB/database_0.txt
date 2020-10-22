@@ -3,20 +3,30 @@
 /---------------------------------------------------------------
  |  0th STAGE of creation
  |  INTERFACEs
+ |                    [0th stage] controls
+ |                                   |
+ |                 ----------------------------------    
+ |                 |                 |              |
+ |  [1th stage] control           control0       control1 
+ |
+ |  [2nd stage] Control::Control
+ |              control_0
+ |              control_1
+ |              ...
 ---------------------------------------------------------------/
-clusters    string    controls
+interfaces    string    controls
 
 
-======================= IF DERIVED CLASSES =====================
+========================== DERIVED CLASSES =====================
 /---------------------------------------------------------------
- |  1st STAGE of clusters creation - 
+ |  1st STAGE of derived classes creation - 
  |  DERIVED CLASSES FROM INTERFACEs
 ---------------------------------------------------------------/
 controls      string    control
 
 
 /---------------------------------------------------------------
- |  2st STAGE of clusters creation 
+ |  2st STAGE of derived classes creation 
  |  CONSTRUCTORs NAMES AND INSTANCEs NAMES
 ---------------------------------------------------------------/
 [CONTROLS]

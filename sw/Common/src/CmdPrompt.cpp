@@ -112,7 +112,9 @@ void Common::CmdPrompt::cmdControls(const std::string& str)
 
 void Common::CmdPrompt::cmdHelp()
 {
-	std::cout << " [ HELP ] " << std::endl;
-	std::cout << " | controls  Info about controls (Keys)" << std::endl;
-	std::cout << " | read      Read from File" << std::endl;
+	std::string helpStr(" [ HELP ] \n"
+	" | controls  Info about controls (Keys) \n" 
+	" | read      Read from File ");
+
+	std::cout << helpStr << '\n';
 }
