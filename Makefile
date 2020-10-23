@@ -18,6 +18,7 @@ allPreReq = main.o \
 		    EventHandler.o \
 			LoggingAcceptor.o \
 		    Control.o \
+			Service0.o \
 
 # target: prerequisites ...
 #     recipe
@@ -44,7 +45,8 @@ LoggingAcceptor.o: sw/Reactor/src/LoggingAcceptor.cpp
 # Services
 Control.o: sw/Services/src/Control.cpp
 	g++ -c $(allDirs) sw/Services/src/Control.cpp
-
+Service0.o: sw/Services/src/Service0.cpp
+	g++ -c $(allDirs) sw/Services/src/Service0.cpp
 
 
 

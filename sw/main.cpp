@@ -15,6 +15,8 @@
 
 #include "ControlIf.h"
 #include "Control.h"
+#include "ServiceIf.h"
+#include "Service0.h"
 
 int main()
 {
@@ -27,7 +29,7 @@ int main()
     Reactor::InitiationDispatcher::getInstance().init();
     Reactor::InitiationDispatcher::getInstance().handle_events();
     */
-
+   
     // FACTORY
     Common::Factory::Factory::getInstance().preInit();
     Common::Factory::Factory::getInstance().createObjects();

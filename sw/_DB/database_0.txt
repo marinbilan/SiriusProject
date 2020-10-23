@@ -3,18 +3,18 @@
 /---------------------------------------------------------------
  |  0th STAGE of creation
  |  INTERFACEs
- |                    [0th stage] controls
+ |                    [0th stage] ServiceIf
  |                                   |
  |                 ----------------------------------    
  |                 |                 |              |
- |  [1th stage] control           control0       control1 
+ |  [1th stage] Service0          Service1       Service2 
  |
- |  [2nd stage] Control::Control
- |              control_0
- |              control_1
+ |  [2nd stage] Service::Service0
+ |              service0_0
+ |              service0_1
  |              ...
 ---------------------------------------------------------------/
-interfaces    string    controls
+Interfaces    string    controls ServiceIf
 
 
 ========================== DERIVED CLASSES =====================
@@ -23,7 +23,7 @@ interfaces    string    controls
  |  DERIVED CLASSES FROM INTERFACEs
 ---------------------------------------------------------------/
 controls      string    control
-
+ServiceIf     string    Service0    
 
 /---------------------------------------------------------------
  |  2st STAGE of derived classes creation 
@@ -32,3 +32,7 @@ controls      string    control
 [CONTROLS]
 controls_control_constructorName    string    Control::Control
 controls_control_instanceNames      string    control_0
+
+[SERVICES]
+ServiceIf_Service0_constructorName    string    Service::Service0
+ServiceIf_Service0_instanceNames      string    service0_0

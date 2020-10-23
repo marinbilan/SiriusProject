@@ -11,6 +11,8 @@
 
 #include "ControlIf.h"
 #include "Control.h"
+#include "ServiceIf.h"
+#include "Service0.h"
 
 // Map in class members (ClassName, constructorPtr(const str&, const str&))
 // Register class in map with registerClass method
@@ -104,8 +106,8 @@ public:
 	}
 
 
-	/*! @brief Set database object created from init object (during init phase)
-	*   @param database
+	/*! @brief  Set database object created from init object (during init phase)
+	*   @param  database
 	*   @return void
 	*/
 	void setDatabase(std::unique_ptr<Common::Database>& database)
@@ -114,7 +116,7 @@ public:
 	}
 
 
-	/*! @brief Get reference on global database object
+	/*! @brief  Get reference on global database object
      *  @return reference on database object
      */
 	std::unique_ptr<Common::Database>& getDatabase()
@@ -123,7 +125,7 @@ public:
 	}
 
 
-	/*! @brief Get reference on global error object
+	/*! @brief  Get reference on global error object
 	 *  @return reference on error object
 	 */
 	/*std::unique_ptr<Common::Error>& getErrorObject()
@@ -132,8 +134,8 @@ public:
 	}*/
 
 
-	/*! @brief Get reference on global log object
-	 *  @param -
+	/*! @brief  Get reference on global log object
+	 *  @param  -
 	 *  @return reference on log object
 	 */
 	std::unique_ptr<Common::Log>& getLog()
@@ -142,17 +144,17 @@ public:
 	}
 
 
-	/*! @brief Register class using MACRO - Generator of objects
+	/*! @brief  Register class using MACRO - Generator of objects
      *  @return void
      */
 	void registerClass()
 	{
-		// ControlIf
 		REGISTER_CLASS(Control::Control);
+		REGISTER_CLASS(Service::Service0);
 	}
 
 
-	/*! @brief Create objects from DB
+	/*! @brief  Create objects from DB
 	 *  @return void
 	 */
 	void createObjects()
@@ -166,16 +168,15 @@ public:
 
 	void createAllObjects()
 	{
-		std::string interfaces("interfaces");
+		std::string interfaces("Interfaces");
 		std::vector<std::string> vecOfInterfacesStrings;
 
         // INTERFACEs
-		// [0th DB Stage]: interfaces    string    controls ...
+		// [0th DB Stage]: interfaces    string  ServiceIf ...
         m_database->getStringsFromDB(interfaces, vecOfInterfacesStrings);
 
 		for (auto s : vecOfInterfacesStrings)
 		{
-            // std::cout << "xxx interfaces: " << s << '\n';
 			createModels(s);
 		}
 	}
@@ -186,22 +187,22 @@ public:
 		std::vector<std::string> vecOfModelsStrings;
 
         // DERIVED CLASSEs
-		// [1th DB Stage]: controls    string    control ...
+		// [1th DB Stage]: controls    string       Service0 ...
         m_database->getStringsFromDB(interfacePath, vecOfModelsStrings);
 
 		for (auto s : vecOfModelsStrings)
 		{
-			// dB ex: instanceDbPath: "controls_control_"
+			// For Constructor (1st argument): "ServiceIf_Service0_"
 			std::string instanceDbPath = interfacePath + "_" + s + "_"; // arg0 of constructor - Instance dB locator
 
 			std::string constructorNameDbPath = interfacePath + "_" + s + "_" + "constructorName";
 			std::vector<std::string> vecOfConstructorString;
-			// ex vecOfConstructorString[0]: "Control::Control"
+			// For Constructor pointers map - vecOfConstructorString[0]: "Service::Service0"
             m_database->getStringsFromDB(constructorNameDbPath, vecOfConstructorString);
 
 			std::string instanceNameDbPath = interfacePath + "_" + s + "_" + "instanceNames";
 			std::vector<std::string> vecOfInstanceString;
-			// ex vecOfInstanceString: "control_0"
+			// ex vecOfInstanceString: "service0_0"
             m_database->getStringsFromDB(instanceNameDbPath, vecOfInstanceString);
 
 			// Create each instance
@@ -214,6 +215,14 @@ public:
 					controlInstance->preInitialization();
 
 					storeInContainer("ControlIf", controlInstance); 
+					std::cout << ".";
+				}
+				if (!interfacePath.compare("ServiceIf"))
+				{
+					std::shared_ptr<Service::ServiceIf> serviceInstance((Service::ServiceIf*)constructObject(vecOfConstructorString[0], instanceDbPath, s));
+					serviceInstance->preInitialization();
+
+					storeInContainer("ServiceIf", serviceInstance); 
 					std::cout << ".";
 				}
 				else 
@@ -284,6 +293,10 @@ public:
 		{
 			m_vecOfControlIf.push_back(std::dynamic_pointer_cast<Control::ControlIf>(derivedObject));
 		}
+		if (!objNameIf.compare("ServiceIf"))
+		{
+			m_vecOfServiceIf.push_back(std::dynamic_pointer_cast<Service::ServiceIf>(derivedObject));
+		}
 		else
 		{
 			// FACTORY.getErrorObject()->setError("ERROR: " + objNameIf + " can not be found!");
@@ -301,6 +314,11 @@ public:
 	std::vector<std::shared_ptr<Control::ControlIf>>& getControlIfVec()
 	{
 		return m_vecOfControlIf;
+	}
+
+	std::vector<std::shared_ptr<Service::ServiceIf>>& getServiceIfVec()
+	{
+		return m_vecOfServiceIf;
 	}
 	/*std::shared_ptr<Control::ControlIf>& getControlIf(const std::string& arg0)
 	{
@@ -347,7 +365,7 @@ private:
 
 
 	// Container Stuff
-	std::vector<std::shared_ptr<Control::ControlIf>>     m_vecOfControlIf;
-
+	std::vector<std::shared_ptr<Control::ControlIf>> m_vecOfControlIf;
+	std::vector<std::shared_ptr<Service::ServiceIf>> m_vecOfServiceIf;
 };
 } // End of namespace
