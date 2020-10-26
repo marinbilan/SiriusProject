@@ -16,8 +16,9 @@ public:
 		return m_name;
 	}
 
-	void preInitialization();
-	void postInitialization();
+	void preInit();
+	void postInit();
+
 
     // cmd handling
 	void dump();

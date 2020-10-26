@@ -88,7 +88,7 @@ public:
         std::cout << "Factory preinit method called!" << '\n';
 
 		// DATABASE - Create DB and store it in Factory
-		std::unique_ptr<Common::Database> database = std::make_unique<Common::Database>("sw/_DB/database_0.txt");
+		std::unique_ptr<Common::Database> database = std::make_unique<Common::Database>("../sw/_DB/database_0.txt");
 		Common::Factory::getInstance().setDatabase(database);
 
 		// Create global Error object
@@ -212,7 +212,7 @@ public:
 				if (!interfacePath.compare("controls"))
 				{
 					std::shared_ptr<Control::ControlIf> controlInstance((Control::ControlIf*)constructObject(vecOfConstructorString[0], instanceDbPath, s));
-					controlInstance->preInitialization();
+					controlInstance->preInit();
 
 					storeInContainer("ControlIf", controlInstance); 
 					std::cout << ".";
@@ -220,7 +220,7 @@ public:
 				if (!interfacePath.compare("ServiceIf"))
 				{
 					std::shared_ptr<Service::ServiceIf> serviceInstance((Service::ServiceIf*)constructObject(vecOfConstructorString[0], instanceDbPath, s));
-					serviceInstance->preInitialization();
+					serviceInstance->preInit();
 
 					storeInContainer("ServiceIf", serviceInstance); 
 					std::cout << ".";
@@ -320,10 +320,16 @@ public:
 	{
 		return m_vecOfServiceIf;
 	}
-	/*std::shared_ptr<Control::ControlIf>& getControlIf(const std::string& arg0)
+
+	std::shared_ptr<Control::ControlIf>& getControlIf(const std::string& arg0)
 	{
 		return getObjectFromVec(m_vecOfControlIf, arg0);
-	}*/
+	}
+
+	std::shared_ptr<Service::ServiceIf>& getServiceIf(const std::string& arg0)
+	{
+		return getObjectFromVec(m_vecOfServiceIf, arg0);
+	}
 	// ----
 
 	// Generic getter 

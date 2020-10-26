@@ -18,21 +18,15 @@
 #include "ServiceIf.h"
 #include "Service0.h"
 
+
 int main()
-{
-    // std::cout << "Hello World from projectX!" << "\n";
-
-    // REACTOR
-    /*
-	Reactor::Logging_Acceptor la(0);
-
-    Reactor::InitiationDispatcher::getInstance().init();
-    Reactor::InitiationDispatcher::getInstance().handle_events();
-    */
-   
+{   
     // FACTORY
     Common::Factory::Factory::getInstance().preInit();
     Common::Factory::Factory::getInstance().createObjects();
+
+    auto ctrl = FACTORY.getControlIf("control_0");
+    ctrl->postInit();
 
     // CMD PROMPT
     Common::CmdPrompt cmd("TestCmd");

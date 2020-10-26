@@ -2,18 +2,17 @@
 #include "Control.h"
 
 #include "Factory.h"
+#include "CmdPrompt.h"
+
+#include <future>
 
 
 Control::Control::Control(const std::string& dbPath, const std::string& name) : 
 	m_dbPath(dbPath),
 	m_name(name)
 {
-/*	FACTORY.getLog()->LOGFILE(LOG "Control: " + m_name + " created.");
-*/
 	m_dbPathWithName = m_dbPath + m_name + "_";
-	std::cout << " CREATION INSTANCE - m_dbPathWithName: " << m_dbPathWithName << " modelName: " << m_name << '\n';
-
-	FACTORY.getLog()->LOGFILE(LOG "Control: " + m_name + " created. [CONSTRUCTOR]");
+	FACTORY.getLog()->LOGFILE(LOG "[CONSTRUCTOR]: " + m_name + " created.");
 }
 
 
@@ -22,22 +21,38 @@ Control::Control::~Control()
 }
 
 
-void Control::Control::preInitialization()
+void Control::Control::preInit()
 {
-	std::cout << "preInitialization - m_dbPathWithName: " << m_dbPathWithName << " modelName: " << m_name << '\n';
+	FACTORY.getLog()->LOGFILE(LOG "[PREINIT]: " + m_name);
 }
 
 
-void Control::Control::postInitialization()
+void Control::Control::postInit()
 {
+	FACTORY.getLog()->LOGFILE(LOG "[POSTINIT]: " + m_name);
 
+	// ---- MAIN START ----
+	// auto fut = std::async(this->thr);
+	std::shared_ptr<Service::ServiceIf> srvInst = FACTORY.getServiceIf("service0_0");
+	// srvInst->postInit();
+
+	// auto fut = [=]() { srvInst->postInit; };
+	// auto fut = std::async(Service::Service0::postInit, srvInst);
+    // auto fut = std::async(std::launch::async, &Service::Service0::postInit, srvInst);
+	auto fut = std::async(&Service::ServiceIf::postInit, srvInst);
+	std::cout << " --- After async" << '\n';
+
+    // CMD PROMPT
+    Common::CmdPrompt cmd("TestCmd");
+    cmd.runCmdPrompt();
 }
 
 
 void Control::Control::dump()
 {
-    std::cout << " Control DbPathWithName: " << m_dbPathWithName << '\n'; 
+
 	std::cout << " Control Name: " << m_name << '\n';
+    std::cout << " Control DbPathWithName: " << m_dbPathWithName << '\n'; 
 }
 
 

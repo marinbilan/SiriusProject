@@ -17,8 +17,8 @@ public:
 		return returnErrorStr;
 	}
 
-	virtual void preInitialization() {};
-	virtual void postInitialization() {};
+	virtual void preInit() {};
+	virtual void postInit() {};
 
     // cmd handling
 	virtual void dump() {};

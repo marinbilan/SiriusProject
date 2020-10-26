@@ -3,6 +3,13 @@
 
 #include "Factory.h"
 
+#include <chrono>
+#include <thread>
+
+#include "EventHandlerIf.h"
+#include "EventHandler.h"
+#include "InitiationDispatcher.h"
+#include "LoggingAcceptor.h"
 
 Service::Service0::Service0(const std::string& dbPath, const std::string& name) : 
 	m_dbPath(dbPath),
@@ -22,15 +29,25 @@ Service::Service0::~Service0()
 }
 
 
-void Service::Service0::preInitialization()
+void Service::Service0::preInit()
 {
 	std::cout << "preInitialization - m_dbPathWithName: " << m_dbPathWithName << " modelName: " << m_name << '\n';
 }
 
 
-void Service::Service0::postInitialization()
+void Service::Service0::postInit()
 {
+	// std::cout << " xxx Service0_0 POSTINIT" << '\n';
+	/*while(1) 
+    {
+        std::cout << " print from postInit ... " << '\n';
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }*/
 
+	// REACTOR
+	// Reactor::Logging_Acceptor la(0);
+    // Reactor::InitiationDispatcher::getInstance().init();
+    // Reactor::InitiationDispatcher::getInstance().handle_events();
 }
 
 
@@ -53,11 +70,11 @@ void Service::Service0::cmdPrompt(const std::string& arg0)
 	std::string regexPattern;
 	if (vectorOfLocalStrings.size() == TWO)
 	{
-		regexPattern = "controls\\s+" + m_name;
+		regexPattern = "services\\s+" + m_name;
 	}
 	else if (vectorOfLocalStrings.size() == THREE)
 	{
-		regexPattern = "controls\\s+" + m_name + "\\s+(\\w+)";
+		regexPattern = "services\\s+" + m_name + "\\s+(\\w+)";
 	}
 	// ----
 
@@ -67,7 +84,7 @@ void Service::Service0::cmdPrompt(const std::string& arg0)
 	{
 		if (vectorOfLocalStrings.size() == TWO)
 		{
-			std::cout << " controls " << m_name << " <set | dump>" << std::endl;
+			std::cout << " services " << m_name << " <set | dump>" << std::endl;
 		}
 		else if (vectorOfLocalStrings.size() == THREE)
 		{

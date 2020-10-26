@@ -10,7 +10,7 @@ namespace Common
 	class Log
 	{
 	public:
-		Log(const std::string& name) : m_name(name), m_logFile("_logs/logFile.txt")
+		Log(const std::string& name) : m_name(name), m_logFile("../_logs/logFile.txt")
 		{
 		}
 
