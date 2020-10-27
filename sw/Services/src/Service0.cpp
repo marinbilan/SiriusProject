@@ -45,9 +45,9 @@ void Service::Service0::postInit()
     }*/
 
 	// REACTOR
-	// Reactor::Logging_Acceptor la(0);
-    // Reactor::InitiationDispatcher::getInstance().init();
-    // Reactor::InitiationDispatcher::getInstance().handle_events();
+	Reactor::Logging_Acceptor la(0);
+    Reactor::InitiationDispatcher::getInstance().init();
+    Reactor::InitiationDispatcher::getInstance().handle_events();
 }
 
 

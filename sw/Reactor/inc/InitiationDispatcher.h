@@ -20,7 +20,7 @@
 
 #define TRUE   1  
 #define FALSE  0  
-
+#define MAX_CLIENTS 30
 #define PORT 8080
 
 /*
@@ -54,15 +54,16 @@ public:
     // Init everything related to server
     void init()
     {
-        std::cout << "[InitiationDispatcher] init everything" << std::endl;
-    
-        //initialise all client_socket[] to 0 so not checked  
+        std::cout << "[InitiationDispatcher] init everything" << MAX_CLIENTS << std::endl;
+        // Init member variables
+
+        // Initialise all client_socket[] to 0 so not checked  
         for (int i = 0; i < max_clients; i++)   
         {   
             client_socket[i] = 0;   
-        }   
+        }
             
-        //create a master socket  
+        // Create a master socket  
         if( (master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0)   
         {   
             perror("socket failed");   
@@ -71,20 +72,20 @@ public:
         
         std::cout << "MASTER_SOCKET_ID: " << master_socket << '\n';
 
-        //set master socket to allow multiple connections ,  
-        //this is just a good habit, it will work without this  
-        if( setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0 )   
+        // Set master socket to allow multiple connections,  
+        // this is just a good habit, it will work without this  
+        if(setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0)   
         {   
             perror("setsockopt");   
             exit(EXIT_FAILURE);   
         }   
         
-        //type of socket created  
+        // Type of socket created  
         address.sin_family = AF_INET;   
         address.sin_addr.s_addr = INADDR_ANY;   
         address.sin_port = htons(PORT);   
 
-        //bind the socket to localhost port 8080  
+        // Bind the socket to localhost port 8080  
         if (bind(master_socket, (struct sockaddr *)&address, sizeof(address))<0)   
         {   
             perror("bind failed");   
@@ -92,14 +93,14 @@ public:
         }   
         printf("Listener on port %d \n", PORT);   
             
-        //try to specify maximum of 3 pending connections for the master socket  
+        // Try to specify maximum of 3 pending connections for the master socket  
         if (listen(master_socket, 3) < 0)   
         {   
             perror("listen");   
             exit(EXIT_FAILURE);   
         }   
             
-        //accept the incoming connection  
+        // Accept the incoming connection  
         addrlen = sizeof(address); 
     }
 
@@ -111,37 +112,27 @@ public:
          
         while(TRUE)   
         {   
-            // [1] clear the socket set  
+            // [1] Clear the socket set  
             FD_ZERO(&readfds);   
         
-            // [2] add master socket to set  
+            // [2] Add master socket to set  
             FD_SET(master_socket, &readfds);   
-            // max_sd = master_socket;
 
             // [3] Set child file descriptors to FD_SET (every iteration)
             for(auto s : m_loggingAcceptor->get_Event_HandlerVec())
             {
                 sd = s->getClientId();
 
-                // if valid socket descriptor then add to read list  
+                // If valid socket descriptor then add to read list  
                 if(sd > 0)   
                 {
                     FD_SET(sd , &readfds);
                 } 
-                    
-                // Highest file descriptor number, need it for the select function  
-                // Changing master socketId all the time
-                /*
-                if(sd > max_sd)
-                {
-                    max_sd = sd; 
-                } 
-                */
             }
         
             // [4] Wait for an activity on one of the sockets, timeout is NULL, so wait indefinitely
             std::cout << "Waiting for activity ..." << '\n';
-            std::cout << "master socket: " << master_socket << '\n';
+            std::cout << "Master socket: " << master_socket << '\n';
             std::cout << "m_loggingAcceptor->get_Event_HandlerVec().size(): " << m_loggingAcceptor->get_Event_HandlerVec().size() << '\n';
             std::cout << "master socket + vec.size() + 1: " << master_socket + m_loggingAcceptor->get_Event_HandlerVec().size() + 1 << '\n';
 
@@ -166,20 +157,15 @@ public:
 
                 m_loggingAcceptor->register_EventHandler(new_socket);
                 // Create handler for each client (client <-> handler)
-                // EventHandler* clientHandler = new EventHandler(new_socket);
                 
                 // Inform user of socket number - used in send and receive commands  
-                printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(address.sin_addr) , ntohs(address.sin_port));
-                // clientHandler->toString();
+                printf("New connection, socket fd is %d, ip is : %s, port : %d\n", new_socket, inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 
                 // Send new connection greeting message 
                 if(send(new_socket, welcomeMessage, strlen(welcomeMessage), 0) != strlen(welcomeMessage) )   
                 {   
                     perror("send");   
                 }
-
-                // Add hendler in vec of handlers
-                // m_vecOfEventHandler.push_back(clientHandler);
             }   
 
             // Close event or Read event
@@ -195,26 +181,9 @@ public:
                         std::cout << " >>>> [ EVENT: CLOSE_EVENT ] <<<< " << '\n';
 
                         // Somebody disconnected , get his details and print  
-                        getpeername(sd , (struct sockaddr*)&address, (socklen_t*)&addrlen);   
-                        printf("Host disconnected , ip %s , port %d \n", inet_ntoa(address.sin_addr) , ntohs(address.sin_port));   
+                        getpeername(sd, (struct sockaddr*)&address, (socklen_t*)&addrlen);   
+                        printf("Host disconnected, ip %s, port %d \n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));   
 
-                        // NEW: Remove EventHandler (client) from vector - move this to Logging_Acceptor
-                        /*
-                        for(auto it = m_loggingAcceptor->get_EventHandlerVec().begin(); it != m_loggingAcceptor->get_EventHandlerVec().end();) 
-                        {
-                            if( (*it)->getClientId() == sd ) 
-                            { 
-                                delete *it; 
-                                std::cout << "Deleting *it: " << *it << '\n'; 
-                                // Delete   
-                                it = m_loggingAcceptor->get_EventHandlerVec().erase(it);
-                            }
-                            else  
-                            { 
-                                ++it;  
-                            } 
-                        }     
-                        */
                        m_loggingAcceptor->remove_EventHandler(sd);
                     }                    
                     // Echo back the message that came in  
@@ -229,7 +198,7 @@ public:
                         // Message from client <-> handler using clientID
                         // TODO - Move this to Logging Acceptor
                         std::string sendMsg = s->send();
-                        send(sd, sendMsg.c_str() , strlen(sendMsg.c_str()) , 0 ); 
+                        send(sd, sendMsg.c_str(), strlen(sendMsg.c_str()), 0);
                     }   
                 } 
             }
@@ -249,19 +218,21 @@ private:
 
     int opt = TRUE; 
 
-    int master_socket;
+    int client_socket[MAX_CLIENTS];
+    int max_clients = MAX_CLIENTS;
+
+    int master_socket; // Master socket ID
+    struct sockaddr_in address; 
     int addrlen; 
+
     int new_socket;
-    int client_socket[30];
-    int max_clients = 30;
 
     int activity;
     int i; 
     int valread;
     int sd;
     // int max_sd;   
-    struct sockaddr_in address;   
-         
+       
     char buffer[1025];  //data buffer of 1K 
 
     // Set of socket descriptors  
@@ -271,8 +242,5 @@ private:
     char* welcomeMessage = "ECHO from multi server";  
 
     Logging_Acceptor* m_loggingAcceptor;
-
-    // TODO: remove this
-    // std::vector<EventHandler*> m_vecOfEventHandler;
 };
 } // End of namespace

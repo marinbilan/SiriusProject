@@ -27,9 +27,6 @@ int Reactor::Logging_Acceptor::handle_event(const std::string& eventType)
 void Reactor::Logging_Acceptor::register_EventHandler(int clientId)
 {
     // Create handler for each client (client <-> handler)
-    //EventHandler* clientHandler = new EventHandler(clientId);
-    //m_vecOfEventHandler.push_back(clientHandler);
-
     EventHandler* clientHandler = new EventHandler(clientId);
     m_vecOfEvent_Handler.push_back(clientHandler);
 }
@@ -53,12 +50,6 @@ void Reactor::Logging_Acceptor::remove_EventHandler(int socketDescriptorId)
     }  
 }
 
-/*
-std::vector<EventHandler*>& Reactor::Logging_Acceptor::get_EventHandlerVec()
-{
-    return m_vecOfEventHandler;
-}
-*/
 
 std::vector<Reactor::EventHandler*>& Reactor::Logging_Acceptor::get_Event_HandlerVec()
 {

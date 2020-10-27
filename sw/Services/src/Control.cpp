@@ -32,15 +32,10 @@ void Control::Control::postInit()
 	FACTORY.getLog()->LOGFILE(LOG "[POSTINIT]: " + m_name);
 
 	// ---- MAIN START ----
-	// auto fut = std::async(this->thr);
+	// REACTOR
 	std::shared_ptr<Service::ServiceIf> srvInst = FACTORY.getServiceIf("service0_0");
-	// srvInst->postInit();
-
-	// auto fut = [=]() { srvInst->postInit; };
-	// auto fut = std::async(Service::Service0::postInit, srvInst);
-    // auto fut = std::async(std::launch::async, &Service::Service0::postInit, srvInst);
-	auto fut = std::async(&Service::ServiceIf::postInit, srvInst);
-	std::cout << " --- After async" << '\n';
+	// auto fut = std::async(&Service::ServiceIf::postInit, srvInst);
+	srvInst->postInit();
 
     // CMD PROMPT
     Common::CmdPrompt cmd("TestCmd");
