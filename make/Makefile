@@ -2,7 +2,9 @@ CXXFLAGS = -g -no-pie -std=c++14
 
 
 # ---- Dirs ----
-allDirs = -I ../sw/Common/if \
+allDirs = -I ../sw/ActiveObject/if \
+          -I ../sw/ActiveObject/inc \
+          -I ../sw/Common/if \
 		  -I ../sw/Common/inc \
 		  -I ../sw/Mayers/if \
 		  -I ../sw/Mayers/inc \
@@ -12,6 +14,9 @@ allDirs = -I ../sw/Common/if \
 		  -I ../sw/Services/inc \
 
 allPreReq = main.o \
+            ActivationQueue.o \
+			Scheduler.o \
+			Servant.o \
 			CmdPrompt.o \
 			Database.o \
 			Log.o \
@@ -27,6 +32,15 @@ Sirius: $(allPreReq)
 
 main.o: ../sw/main.cpp
 	g++ -c $(allDirs) ../sw/main.cpp
+
+# Active Object
+ActivationQueue.o: ../sw/ActiveObject/src/ActivationQueue.cpp
+	g++ -c $(allDirs) ../sw/ActiveObject/src/ActivationQueue.cpp
+Scheduler.o: ../sw/ActiveObject/src/Scheduler.cpp
+	g++ -c $(allDirs) ../sw/ActiveObject/src/Scheduler.cpp
+Servant.o: ../sw/ActiveObject/src/Servant.cpp
+	g++ -c $(allDirs) ../sw/ActiveObject/src/Servant.cpp
+
 # Common
 CmdPrompt.o: ../sw/Common/src/CmdPrompt.cpp
 	g++ -c $(allDirs) ../sw/Common/src/CmdPrompt.cpp
@@ -34,6 +48,7 @@ Database.o: ../sw/Common/src/Database.cpp
 	g++ -c $(allDirs) ../sw/Common/src/Database.cpp
 Log.o: ../sw/Common/src/Log.cpp
 	g++ -c $(allDirs) ../sw/Common/src/Log.cpp
+
 # Mayers
 
 # Reactor

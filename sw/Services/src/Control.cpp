@@ -4,6 +4,10 @@
 #include "Factory.h"
 #include "CmdPrompt.h"
 
+// #include "ActivationQueue.h" // Already included in Scheduler.h
+#include "Scheduler.h"
+#include "Servant.h"
+
 #include <future>
 
 
@@ -33,9 +37,21 @@ void Control::Control::postInit()
 
 	// ---- MAIN START ----
 	// REACTOR
-	std::shared_ptr<Service::ServiceIf> srvInst = FACTORY.getServiceIf("service0_0");
+	// std::shared_ptr<Service::ServiceIf> srvInst = FACTORY.getServiceIf("service0_0");
 	// auto fut = std::async(&Service::ServiceIf::postInit, srvInst);
-	srvInst->postInit();
+	// srvInst->postInit();
+
+
+	// ACTIVE OBJECT
+	// [1] Activation Queue
+	ActiveObject::ActivationQueue actQueue("ActivationQueue");
+	actQueue.dummyMethod();
+	// [2] Scheduler
+	ActiveObject::Scheduler scheduler(&actQueue);
+	scheduler.dispatch();
+	// [3] ActiveObject [Servant]
+	ActiveObject::Servant activeObject(0);
+
 
     // CMD PROMPT
     Common::CmdPrompt cmd("TestCmd");
