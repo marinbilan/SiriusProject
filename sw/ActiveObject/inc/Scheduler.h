@@ -1,33 +1,36 @@
 #pragma once
-
-#include <string>
-#include <vector>
-#include <iostream>
-
+#include "ActiveObjectIf.h"
 #include "ActivationQueue.h"
 
 
 // [2]
 namespace ActiveObject
 {
-class Scheduler  
+class Scheduler : public ActiveObjectIf
 {  
-public:  
-    // Constructor  
-    Scheduler(ActivationQueue* act_queue);
+public:
+    Scheduler(const std::string& dbPath, const std::string& name);
 
-/*
-    void enqueue(MethodRequest* methodRequest)  
-    {  
-        std::cout << " [Scheduler][enqueue] Putting MR object in Activation Queue" << std::endl;  
-        m_actQueue->enqueue(methodRequest);  
-        this->dispatch();  
-    }  
-*/
+    const std::string& getName()
+	{
+		return m_name;
+	}
+
+    void preInit();
+    void postInit();
+    
+    void setActivationQueue(std::shared_ptr<ActiveObject::ActiveObjectIf>& act_queue);
+
+    void enqueue(MethodRequest* methodRequest);
+
     // >>>> RUN THIS IN SEPARATE THREAD <<<<  
-    virtual void dispatch(void);
+    void dispatch(void);
 
-protected:  
-ActivationQueue* m_actQueue;  
+private:
+std::string m_dbPath;
+std::string m_dbPathWithName;
+std::string m_name;
+
+std::shared_ptr<ActiveObject::ActiveObjectIf> m_actQueueShared; 
 };  
 }

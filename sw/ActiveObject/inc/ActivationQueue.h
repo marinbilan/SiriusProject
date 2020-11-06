@@ -1,37 +1,34 @@
-#include <string>
-#include <vector>
-#include <iostream>
+#pragma once
+#include "ActiveObjectIf.h"
 
 
 // [1]
 namespace ActiveObject
 {
-class ActivationQueue  
+class ActivationQueue : public ActiveObjectIf
 {  
-public:  
-    ActivationQueue(const std::string& name);
-    
-    void dummyMethod();
-/*
-    void enqueue(MethodRequest* methodRequest)  
-    {  
-        std::cout << " [ActivationQueue][enqueue] Push MR object in enqueue vector." << std::endl;  
-        m_messagesVector.push_back(methodRequest);  
-    };  
+public:
+    ActivationQueue(const std::string& dbPath, const std::string& name);
 
-    std::vector<MethodRequest*>& getMrVec()  
-    {  
-        return m_messagesVector;  
-    }  
+    const std::string& getName()
+	{
+		return m_name;
+	}
 
-    void dequeue(MethodRequest* method_request)  
-    {  
-        // std::cout << " ActivationQueue dequeue. " << std::endl;  
-    }  
-*/
+    void preInit();
+    void postInit();
+
+    void enqueue(MethodRequest* methodRequest);
+
+    std::vector<MethodRequest*>& getMrVec();
+
+    void dequeue(MethodRequest* method_request);
 
 private:  
-std::string m_name;  
-// std::vector<MethodRequest*> m_messagesVector;
+std::string m_name;
+std::string m_dbPath;
+std::string m_dbPathWithName;
+
+std::vector<MethodRequest*> m_messagesVector;
 };
 }  

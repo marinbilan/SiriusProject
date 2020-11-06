@@ -17,6 +17,7 @@ allPreReq = main.o \
             ActivationQueue.o \
 			Scheduler.o \
 			Servant.o \
+			Proxy.o \
 			CmdPrompt.o \
 			Database.o \
 			Log.o \
@@ -40,6 +41,8 @@ Scheduler.o: ../sw/ActiveObject/src/Scheduler.cpp
 	g++ -c $(allDirs) ../sw/ActiveObject/src/Scheduler.cpp
 Servant.o: ../sw/ActiveObject/src/Servant.cpp
 	g++ -c $(allDirs) ../sw/ActiveObject/src/Servant.cpp
+Proxy.o: ../sw/ActiveObject/src/Proxy.cpp
+	g++ -c $(allDirs) ../sw/ActiveObject/src/Proxy.cpp
 
 # Common
 CmdPrompt.o: ../sw/Common/src/CmdPrompt.cpp

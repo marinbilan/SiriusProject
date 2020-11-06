@@ -28,9 +28,5 @@ int main()
     auto ctrl = FACTORY.getControlIf("control_0");
     ctrl->postInit();
 
-    // CMD PROMPT
-    Common::CmdPrompt cmd("TestCmd");
-    cmd.runCmdPrompt();
-
     return 0;
 }

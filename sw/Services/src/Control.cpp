@@ -6,7 +6,8 @@
 
 // #include "ActivationQueue.h" // Already included in Scheduler.h
 #include "Scheduler.h"
-#include "Servant.h"
+// #include "Servant.h"
+#include "Proxy.h"
 
 #include <future>
 
@@ -41,17 +42,23 @@ void Control::Control::postInit()
 	// auto fut = std::async(&Service::ServiceIf::postInit, srvInst);
 	// srvInst->postInit();
 
-
 	// ACTIVE OBJECT
 	// [1] Activation Queue
-	ActiveObject::ActivationQueue actQueue("ActivationQueue");
-	actQueue.dummyMethod();
-	// [2] Scheduler
-	ActiveObject::Scheduler scheduler(&actQueue);
-	scheduler.dispatch();
-	// [3] ActiveObject [Servant]
-	ActiveObject::Servant activeObject(0);
+	auto actQueue = FACTORY.getActiveObjectIf("activationQueue_0");
+	actQueue->postInit();
 
+	// [2] Scheduler
+	// FACTORY
+	auto scheduler = FACTORY.getActiveObjectIf("scheduler_0");
+	scheduler->postInit();
+
+	// [3] ActiveObject [Servant]
+	auto servant = FACTORY.getActiveObjectIf("servant_0");
+	servant->postInit(); // TODO: Move to postInit
+
+	// [4] Proxy (Interface to Clinets)
+	auto proxy = FACTORY.getActiveObjectIf("proxy_0");
+	proxy->postInit();
 
     // CMD PROMPT
     Common::CmdPrompt cmd("TestCmd");

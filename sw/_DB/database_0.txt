@@ -14,7 +14,7 @@
  |              service0_1
  |              ...
 ---------------------------------------------------------------/
-Interfaces    string    controls ServiceIf
+Interfaces    string    controls ServiceIf ActiveObjectIf
 
 
 ========================== DERIVED CLASSES =====================
@@ -22,8 +22,9 @@ Interfaces    string    controls ServiceIf
  |  1st STAGE of derived classes creation - 
  |  DERIVED CLASSES FROM INTERFACEs
 ---------------------------------------------------------------/
-controls      string    control
-ServiceIf     string    Service0    
+controls       string    control
+ServiceIf      string    Service0
+ActiveObjectIf string    ActivationQueue Scheduler Servant Proxy
 
 /---------------------------------------------------------------
  |  2st STAGE of derived classes creation 
@@ -33,6 +34,38 @@ ServiceIf     string    Service0
 controls_control_constructorName    string    Control::Control
 controls_control_instanceNames      string    control_0
 
+
 [SERVICES]
 ServiceIf_Service0_constructorName    string    Service::Service0
 ServiceIf_Service0_instanceNames      string    service0_0
+
+
+[ACTIVE OBJECT]
+// ActivationQueue
+ActiveObjectIf_ActivationQueue_constructorName    string     ActiveObject::ActivationQueue
+ActiveObjectIf_ActivationQueue_instanceNames      string     activationQueue_0
+
+// Scheduler
+ActiveObjectIf_Scheduler_constructorName    string     ActiveObject::Scheduler
+ActiveObjectIf_Scheduler_instanceNames      string     scheduler_0
+
+// Servant
+ActiveObjectIf_Servant_constructorName    string     ActiveObject::Servant
+ActiveObjectIf_Servant_instanceNames      string     servant_0
+
+// Proxy
+ActiveObjectIf_Proxy_constructorName    string     ActiveObject::Proxy
+ActiveObjectIf_Proxy_instanceNames      string     proxy_0
+
+
+/---------------------------------------------------------------
+ |  INSTANCEs
+---------------------------------------------------------------/
+// ActivationQueue
+
+// Scheduler
+ActiveObjectIf_Scheduler_scheduler_0_activationQueue    string    activationQueue_0 
+
+// Proxy
+ActiveObjectIf_Proxy_proxy_0_scheduler    string    scheduler_0 
+ActiveObjectIf_Proxy_proxy_0_servant      string    servant_0 

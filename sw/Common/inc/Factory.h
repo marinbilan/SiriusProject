@@ -13,6 +13,12 @@
 #include "Control.h"
 #include "ServiceIf.h"
 #include "Service0.h"
+// Active Object
+#include "ActiveObjectIf.h"
+#include "ActivationQueue.h"
+#include "Scheduler.h"
+#include "Servant.h"
+#include "Proxy.h"
 
 // Map in class members (ClassName, constructorPtr(const str&, const str&))
 // Register class in map with registerClass method
@@ -149,8 +155,14 @@ public:
      */
 	void registerClass()
 	{
+		// STEP: 1 - #include derived class
 		REGISTER_CLASS(Control::Control);
 		REGISTER_CLASS(Service::Service0);
+		// Active Object
+		REGISTER_CLASS(ActiveObject::ActivationQueue);
+		REGISTER_CLASS(ActiveObject::Scheduler);
+		REGISTER_CLASS(ActiveObject::Servant);
+		REGISTER_CLASS(ActiveObject::Proxy);
 	}
 
 
@@ -209,6 +221,7 @@ public:
 			// ex: control_0 ...
 			for (auto s : vecOfInstanceString)
 			{
+				// STEP: 2
 				if (!interfacePath.compare("controls"))
 				{
 					std::shared_ptr<Control::ControlIf> controlInstance((Control::ControlIf*)constructObject(vecOfConstructorString[0], instanceDbPath, s));
@@ -225,10 +238,59 @@ public:
 					storeInContainer("ServiceIf", serviceInstance); 
 					std::cout << ".";
 				}
+				if (!interfacePath.compare("ActiveObjectIf"))
+				{				
+					std::shared_ptr<ActiveObject::ActiveObjectIf> activeObjectInstance((ActiveObject::ActiveObjectIf*)constructObject(vecOfConstructorString[0], instanceDbPath, s));
+					activeObjectInstance->preInit();					
+
+					storeInContainer("ActiveObjectIf", activeObjectInstance); 
+					std::cout << ".";
+				}
 				else 
 				{					
 				}
 			}
+		}
+	}
+
+
+	// TODO: Remove Template setter (store)
+	/*	void storeInContainer(const std::shared_ptr<GPUObject::MeshStructure>& meshStruct)
+	{
+		m_vecOfMeshStructure.push_back(meshStruct);
+	}
+
+	void storeInContainer(const std::shared_ptr<GPUObject::RawTextureStructure>& rawTextureStruct)
+	{
+		m_vecOfRawTextureStructure.push_back(rawTextureStruct);
+	}*/
+
+
+	/*! @brief Store object in container
+	 *  @param - objNameIf
+	 *  @param - derivedObject
+	 *  @return void
+	 */
+	template<class T>
+	void storeInContainer(const std::string& objNameIf, const T& derivedObject)
+	{
+		// STEP: 3
+		if (!objNameIf.compare("ControlIf"))
+		{
+			m_vecOfControlIf.push_back(std::dynamic_pointer_cast<Control::ControlIf>(derivedObject));
+		}
+		if (!objNameIf.compare("ServiceIf"))
+		{
+			m_vecOfServiceIf.push_back(std::dynamic_pointer_cast<Service::ServiceIf>(derivedObject));
+		}
+		if (!objNameIf.compare("ActiveObjectIf"))
+		{
+			m_vecOfActiveObjectIf.push_back(std::dynamic_pointer_cast<ActiveObject::ActiveObjectIf>(derivedObject));
+		}
+		else
+		{
+			// FACTORY.getErrorObject()->setError("ERROR: " + objNameIf + " can not be found!");
+			// FACTORY.getLog()->LOGFILE(LOG "ERROR: " + objNameIf + " can not be found!");
 		}
 	}
 
@@ -270,39 +332,6 @@ public:
 		}
 	}
 
-	// TODO: Remove Template setter (store)
-/*	void storeInContainer(const std::shared_ptr<GPUObject::MeshStructure>& meshStruct)
-	{
-		m_vecOfMeshStructure.push_back(meshStruct);
-	}
-
-	void storeInContainer(const std::shared_ptr<GPUObject::RawTextureStructure>& rawTextureStruct)
-	{
-		m_vecOfRawTextureStructure.push_back(rawTextureStruct);
-	}*/
-
-	/*! @brief Store object in container
-	 *  @param - objNameIf
-	 *  @param - derivedObject
-	 *  @return void
-	 */
-	template<class T>
-	void storeInContainer(const std::string& objNameIf, const T& derivedObject)
-	{
-		if (!objNameIf.compare("ControlIf"))
-		{
-			m_vecOfControlIf.push_back(std::dynamic_pointer_cast<Control::ControlIf>(derivedObject));
-		}
-		if (!objNameIf.compare("ServiceIf"))
-		{
-			m_vecOfServiceIf.push_back(std::dynamic_pointer_cast<Service::ServiceIf>(derivedObject));
-		}
-		else
-		{
-			// FACTORY.getErrorObject()->setError("ERROR: " + objNameIf + " can not be found!");
-			// FACTORY.getLog()->LOGFILE(LOG "ERROR: " + objNameIf + " can not be found!");
-		}
-	}
 
 	// GET object - TODO: Make this generic
 	/*! @brief get object (within particaulary interface) from container
@@ -311,6 +340,7 @@ public:
 	 *  @return void
 	 */
 	// -- Get Controls via Interface --
+	// STEP: 4
 	std::vector<std::shared_ptr<Control::ControlIf>>& getControlIfVec()
 	{
 		return m_vecOfControlIf;
@@ -321,6 +351,12 @@ public:
 		return m_vecOfServiceIf;
 	}
 
+	std::vector<std::shared_ptr<ActiveObject::ActiveObjectIf>>& getActiveObjectIfVec()
+	{
+		return m_vecOfActiveObjectIf;
+	}
+
+	// STEP: 5
 	std::shared_ptr<Control::ControlIf>& getControlIf(const std::string& arg0)
 	{
 		return getObjectFromVec(m_vecOfControlIf, arg0);
@@ -329,6 +365,11 @@ public:
 	std::shared_ptr<Service::ServiceIf>& getServiceIf(const std::string& arg0)
 	{
 		return getObjectFromVec(m_vecOfServiceIf, arg0);
+	}
+
+	std::shared_ptr<ActiveObject::ActiveObjectIf>& getActiveObjectIf(const std::string& arg0)
+	{
+		return getObjectFromVec(m_vecOfActiveObjectIf, arg0);
 	}
 	// ----
 
@@ -371,7 +412,9 @@ private:
 
 
 	// Container Stuff
+	// STEP: 6
 	std::vector<std::shared_ptr<Control::ControlIf>> m_vecOfControlIf;
 	std::vector<std::shared_ptr<Service::ServiceIf>> m_vecOfServiceIf;
+	std::vector<std::shared_ptr<ActiveObject::ActiveObjectIf>> m_vecOfActiveObjectIf;
 };
 } // End of namespace
