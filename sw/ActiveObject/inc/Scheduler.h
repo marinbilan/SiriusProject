@@ -20,7 +20,7 @@ public:
     void postInit();
     
     void setActivationQueue(std::shared_ptr<ActiveObject::ActiveObjectIf>& act_queue);
-
+    // Place mutex in this method
     void enqueue(MethodRequest* methodRequest);
 
     // >>>> RUN THIS IN SEPARATE THREAD <<<<  
@@ -31,6 +31,6 @@ std::string m_dbPath;
 std::string m_dbPathWithName;
 std::string m_name;
 
-std::shared_ptr<ActiveObject::ActiveObjectIf> m_actQueueShared; 
+std::shared_ptr<ActiveObject::ActiveObjectIf> m_actQueueShared;
 };  
 }

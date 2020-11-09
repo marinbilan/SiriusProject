@@ -36,9 +36,6 @@ public:
     // [2] Scheduler
     virtual void setActivationQueue(std::shared_ptr<ActiveObject::ActiveObjectIf>& act_queue) {};
 
-    // Already in ActivationQueue
-    // virtual void enqueue(MethodRequest* methodRequest) {};
-
     // >>>> RUN THIS IN SEPARATE THREAD <<<<  
     virtual void dispatch(void) {};
 
@@ -54,6 +51,6 @@ public:
     // [4] Proxy
 
 private:
-    std::string returnErrorStr = "Error: ControlIf::getName() called from ControlIf!";
+    std::string returnErrorStr = "Error: ActiveObjectIf::getName() called from ActiveObjectIf!";
 };
-}  
+}

@@ -48,36 +48,36 @@ void ActiveObject::Scheduler::setActivationQueue(std::shared_ptr<ActiveObject::A
 
 void ActiveObject::Scheduler::enqueue(MethodRequest* methodRequest)
 {  
-    std::cout << " [Scheduler][enqueue] Putting MR object in Activation Queue" << std::endl;  
+    // std::cout << " [Scheduler][enqueue] Putting MR object in Activation Queue" << std::endl; 
+    FACTORY.getLog()->LOGFILE(LOG "Scheduler: " + m_name + " enqueue(MethodRequest* methodRequest) Putting MR object in Activation Queue."); 
     m_actQueueShared->enqueue(methodRequest);  
-    this->dispatch();  
+    // this->dispatch();  
 }  
 
 
 void ActiveObject::Scheduler::dispatch()
 {
-        std::cout << " [Scheduler][dispatch] Calling ..." << std::endl;  
+    FACTORY.getLog()->LOGFILE(LOG "Scheduler: " + m_name + " dispatch()");
 
-        std::vector<MethodRequest*>& mrVec = m_actQueueShared->getMrVec();  
+    std::vector<MethodRequest*>& mrVec = m_actQueueShared->getMrVec();  
+    std::vector<MethodRequest*>::iterator it = mrVec.begin();  
+    //std::cout << " ---- Before while. mrVec.size() = " << mrVec.size() << std::endl;  
 
-        std::vector<MethodRequest*>::iterator it = mrVec.begin();  
-        //std::cout << " ---- Before while. mrVec.size() = " << mrVec.size() << std::endl;  
-
-        while (it != mrVec.end())  
+    while (it != mrVec.end())  
+    {  
+        MethodRequest* mr = *it;  
+        //std::cout << " ---- In while" << std::endl;  
+        if ((*it)->guard())  
         {  
-            MethodRequest* mr = *it;  
-            //std::cout << " ---- In while" << std::endl;  
-            if ((*it)->guard())  
-            {  
-                // First do operation on servant (Active Object)  
-                (*it)->call();  
-                // delete from vector in real time  
-                it = mrVec.erase(it);  
-                delete mr;  
-            }  
-            else  
-            {  
-                it++;  
-            }  
-        }
+            // First do operation on servant (Active Object)  
+            (*it)->call();  
+            // delete from vector in real time  
+            it = mrVec.erase(it);  
+            delete mr;  
+        }  
+        else  
+        {  
+            it++;
+        }  
+    }
 }

@@ -60,6 +60,13 @@ void Control::Control::postInit()
 	auto proxy = FACTORY.getActiveObjectIf("proxy_0");
 	proxy->postInit();
 
+	// Proxy request
+	std::string proxyReq("This is put request: arg0, arg1");
+	proxy->put(proxyReq);
+
+	// Separate thread. All time dispatch and execute methods on Active Object (servant)
+	scheduler->dispatch();
+
     // CMD PROMPT
     Common::CmdPrompt cmd("TestCmd");
     cmd.runCmdPrompt();

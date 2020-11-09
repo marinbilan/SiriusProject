@@ -23,18 +23,15 @@ public:
     void postInit();
 
     // Message queue implementation operations.  
-    /*    void put(const Message& msg)  
-    {  
-        std::cout << " [Servant][put_i] Putting Message in AO: " << msg << std::endl;  
-        m_messages.push_back(msg);  
-    }  
-    
+    void put(const Message& msg);
+
+    /*    
     Message get(void)  
     {  
         std::cout << " [Servant][get] Getting Message: - " << std::endl;  
     }*/
 
-// Predicates.  
+    // Predicates.  
     bool checkEmpty(void) const;  
 
     bool checkFull(void) const;
@@ -45,6 +42,6 @@ std::string m_dbPathWithName;
 std::string m_name;
 
 int m_id;  
-// std::vector<Message> m_messages;
+std::vector<Message> m_messages;
 };  
 }

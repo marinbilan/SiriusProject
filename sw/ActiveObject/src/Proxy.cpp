@@ -1,5 +1,5 @@
 #include "Proxy.h"
-#include "Put.h"
+#include "ActObjMethods.h"
 #include "Factory.h"
 
 
@@ -15,13 +15,13 @@ ActiveObject::Proxy::Proxy(const std::string& dbPath, const std::string& name) :
 
 void ActiveObject::Proxy::preInit()  
 {  
-    FACTORY.getLog()->LOGFILE(LOG "Proxy: " + m_name + " preInit(...).");
+    FACTORY.getLog()->LOGFILE(LOG "Proxy: " + m_name + " preInit().");
 };  
 
 
 void ActiveObject::Proxy::postInit()  
 {  
-    FACTORY.getLog()->LOGFILE(LOG "Proxy: " + m_name + " postInit(...).");
+    FACTORY.getLog()->LOGFILE(LOG "Proxy: " + m_name + " postInit().");
     // Get scheduler instance name from database
 	std::vector<std::string> scheduler;
     std::string dBKey = m_dbPathWithName + "scheduler";
@@ -41,15 +41,16 @@ void ActiveObject::Proxy::postInit()
     // Get servant instance from factory container via instance name
     auto servantInst = FACTORY.getActiveObjectIf(servant[0]);
     // Set servant
-    m_servantShared = servantInst; 
+    m_servantShared = servantInst;
 };  
 
 
 void ActiveObject::Proxy::put(const Message& msg)  
 {  
-    FACTORY.getLog()->LOGFILE(LOG "Proxy: " + m_name + " put(...) Creating MR Put object..");
-    // ActiveObject::MethodRequest* methodRequest = new ActiveObject::Put(m_servant, msg);  
-    // m_scheduler->enqueue(methodRequest);  
+    FACTORY.getLog()->LOGFILE(LOG "Proxy: " + m_name + " put(const Message& msg) Creating MR Put object.");
+
+    ActiveObject::MethodRequest* methodRequest = new ActiveObject::Put(m_servantShared, msg);  
+    m_schedulerShared->enqueue(methodRequest);
 }
 
 

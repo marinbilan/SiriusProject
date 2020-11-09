@@ -1,4 +1,5 @@
 #include "ActivationQueue.h"
+#include "Factory.h"
 
 
 ActiveObject::ActivationQueue::ActivationQueue(const std::string& dbPath, const std::string& name) : 
@@ -28,7 +29,9 @@ void ActiveObject::ActivationQueue::postInit()
 
 void ActiveObject::ActivationQueue::enqueue(MethodRequest* methodRequest)  
 {  
-    std::cout << " [ActivationQueue][enqueue] Push MR object in enqueue vector." << std::endl;  
+    // std::cout << " [ActivationQueue][enqueue] Push MR object in enqueue vector." << std::endl;  
+    FACTORY.getLog()->LOGFILE(LOG "ActivationQueue: " + m_name + " enqueue(MethodRequest* methodRequest) Push MR object in enqueue vector."); 
+
     m_messagesVector.push_back(methodRequest);  
 };  
 

@@ -18,6 +18,7 @@ allPreReq = main.o \
 			Scheduler.o \
 			Servant.o \
 			Proxy.o \
+			ActObjMethods.o \
 			CmdPrompt.o \
 			Database.o \
 			Log.o \
@@ -43,6 +44,8 @@ Servant.o: ../sw/ActiveObject/src/Servant.cpp
 	g++ -c $(allDirs) ../sw/ActiveObject/src/Servant.cpp
 Proxy.o: ../sw/ActiveObject/src/Proxy.cpp
 	g++ -c $(allDirs) ../sw/ActiveObject/src/Proxy.cpp
+ActObjMethods.o: ../sw/ActiveObject/src/ActObjMethods.cpp
+	g++ -c $(allDirs) ../sw/ActiveObject/src/ActObjMethods.cpp
 
 # Common
 CmdPrompt.o: ../sw/Common/src/CmdPrompt.cpp

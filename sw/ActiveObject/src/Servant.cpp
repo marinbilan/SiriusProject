@@ -1,4 +1,5 @@
 #include "Servant.h"
+#include "Factory.h"
 
 
 ActiveObject::Servant::Servant(const std::string& dbPath, const std::string& name) : 
@@ -28,11 +29,21 @@ void ActiveObject::Servant::postInit()
 
 bool ActiveObject::Servant::checkEmpty(void) const
 {  
-    std::cout << " [Servant][checkEmpty] Getting Message: - " << std::endl;  
+    FACTORY.getLog()->LOGFILE(LOG "Servant: " + m_name + " checkEmpty(). Check if avail to do operation on AO"); 
 } 
+
 
 bool ActiveObject::Servant::checkFull(void) const
 {  
-    std::cout << " [Servant][checkFull] Getting Message: [ Not Full ] " << std::endl;  
+    FACTORY.getLog()->LOGFILE(LOG "Servant: " + m_name + " checkFull(). Check if avail to do operation on AO"); 
     return 0; 
 }
+
+
+// Message queue implementation operations.  
+void ActiveObject::Servant::put(const Message& msg)  
+{  
+    // std::cout << " [Servant][put_i] Putting Message in AO: " << msg << std::endl; 
+    FACTORY.getLog()->LOGFILE(LOG "Servant: " + m_name + " execute method put(const Message& msg)"); 
+    m_messages.push_back(msg);  
+}  
