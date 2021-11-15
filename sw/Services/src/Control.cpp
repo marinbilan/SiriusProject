@@ -10,6 +10,7 @@
 #include "Proxy.h"
 
 #include <future>
+#include "ThreadManager.h"
 
 
 Control::Control::Control(const std::string& dbPath, const std::string& name) : 
@@ -44,29 +45,39 @@ void Control::Control::postInit()
 
 	// ACTIVE OBJECT
 	// [1] Activation Queue
-	auto actQueue = FACTORY.getActiveObjectIf("activationQueue_0");
-	actQueue->postInit();
-
+	// auto actQueue = FACTORY.getActiveObjectIf("activationQueue_0");
+	//actQueue->postInit();
 	// [2] Scheduler
 	// FACTORY
-	auto scheduler = FACTORY.getActiveObjectIf("scheduler_0");
-	scheduler->postInit();
-
+	// auto scheduler = FACTORY.getActiveObjectIf("scheduler_0");
+	// std::shared_ptr<ActiveObject::ActiveObjectIf> scheduler = FACTORY.getActiveObjectIf("scheduler_0");
+	//scheduler->postInit();
 	// [3] ActiveObject [Servant]
-	auto servant = FACTORY.getActiveObjectIf("servant_0");
-	servant->postInit(); // TODO: Move to postInit
-
+	// auto servant = FACTORY.getActiveObjectIf("servant_0");
+	//servant->postInit(); // TODO: Move to postInit
 	// [4] Proxy (Interface to Clinets)
-	auto proxy = FACTORY.getActiveObjectIf("proxy_0");
-	proxy->postInit();
-
+	// auto proxy = FACTORY.getActiveObjectIf("proxy_0");
+	//proxy->postInit();
 	// Proxy request
-	std::string proxyReq("This is put request: arg0, arg1");
-	proxy->put(proxyReq);
+
 
 	// Separate thread. All time dispatch and execute methods on Active Object (servant)
-	scheduler->dispatch();
+	// scheduler->dispatch();
 
+	// TODO: Remove
+	/*
+	std::shared_ptr<ActiveObject::ActiveObjectIf> scheduler = FACTORY.getActiveObjectIf("scheduler_0");
+	auto fut = std::async(&ActiveObject::ActiveObjectIf::dispatch, scheduler);
+
+	std::string proxyReq("This is put request: arg0, arg1");
+	FACTORY.getActiveObjectIf("proxy_0")->put(proxyReq);
+	*/
+
+    std::shared_ptr<Service::ServiceIf> threadManager = FACTORY.getServiceIf("threadManager_0").value();
+
+	std::cout << "THREAD MANAGER: " << threadManager->getName() << '\n';
+	threadManager->startAllThreads();
+	
     // CMD PROMPT
     Common::CmdPrompt cmd("TestCmd");
     cmd.runCmdPrompt();

@@ -1,6 +1,8 @@
+
+
 #include "CmdPrompt.h"
 #include "Factory.h"
-
+#include "ServiceIf.h"
 
 Common::CmdPrompt::CmdPrompt(const std::string& name) : m_name(name)
 {
@@ -34,6 +36,32 @@ void Common::CmdPrompt::runCmdPrompt()
 		// Waiting for command
 		std::getline(std::cin, commandLineString);
 
+		// First get God Service - Root Node
+		std::shared_ptr<Service::ServiceIf> serviceIfObjectFromDB = 
+			FACTORY.getServiceIf("service0_0").value_or(std::make_shared<Service::Service0>("tempDBPath", "notInDB"));
+
+		// TODO check that service is ok
+
+		// Cast to Common Interface to reach all nodes via terminal
+		std::shared_ptr<Common::CommonIf> commonServiceIf = std::dynamic_pointer_cast<Common::CommonIf>(serviceIfObjectFromDB);
+
+		// First tokenize terminal stream than process terminal command
+	    // commandLineString: "token0 token1 token2 ..."
+		std::istringstream stringOfElements(commandLineString);
+
+		// separate commandLineString "staticModel dynamicModels  otherModels" in tokens (vector of strings)
+		std::vector<std::string> vectorOfLocalStrings((std::istream_iterator<std::string>(stringOfElements)),
+			std::istream_iterator<std::string>());
+
+	    //for(auto s : vectorOfLocalStrings) {
+	    //    std::cout << s << " " << s.length() << '\n';
+	    // }
+
+		// TODO: if string is "" (empty) - skip
+		commonServiceIf->processTerminalCommadns(vectorOfLocalStrings);
+
+
+/*
 		std::regex oneWordLine("(\\w+)");
 		// One word match
 		if (std::regex_search(commandLineString, match, oneWordLine))
@@ -47,6 +75,7 @@ void Common::CmdPrompt::runCmdPrompt()
 				cmdHelp();
 			}
 		}
+		*/
 	} while (commandLineString != "run");
 }
 

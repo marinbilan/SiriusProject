@@ -1,3 +1,5 @@
+#include <chrono>
+#include <thread>
 #include "Scheduler.h"
 #include "Factory.h"
 
@@ -63,21 +65,28 @@ void ActiveObject::Scheduler::dispatch()
     std::vector<MethodRequest*>::iterator it = mrVec.begin();  
     //std::cout << " ---- Before while. mrVec.size() = " << mrVec.size() << std::endl;  
 
-    while (it != mrVec.end())  
-    {  
-        MethodRequest* mr = *it;  
-        //std::cout << " ---- In while" << std::endl;  
-        if ((*it)->guard())  
+    /*
+    while(1)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::cout << " ---- Scheduler in while ----" << std::endl;
+        while (it != mrVec.end())  
         {  
-            // First do operation on servant (Active Object)  
-            (*it)->call();  
-            // delete from vector in real time  
-            it = mrVec.erase(it);  
-            delete mr;  
-        }  
-        else  
-        {  
-            it++;
-        }  
+            MethodRequest* mr = *it;  
+            // std::cout << " ---- In while" << std::endl;  
+            if ((*it)->guard())  
+            {  
+                // First do operation on servant (Active Object)  
+                (*it)->call();  
+                // delete from vector in real time  
+                it = mrVec.erase(it);  
+                delete mr;  
+            }  
+            else  
+            {  
+                it++;
+            }  
+        }
     }
+    */
 }

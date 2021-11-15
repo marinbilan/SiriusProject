@@ -22,8 +22,8 @@ void ActiveObject::ActivationQueue::preInit()
 
 
 void ActiveObject::ActivationQueue::postInit()  
-{  
-        std::cout << " [ActivationQueue][postInit] ..." << '\n';   
+ {  
+        std::cout << " [ActivationQueue][postInit] ..." << '\n';  
 };  
 
 

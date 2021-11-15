@@ -24,6 +24,7 @@ int main()
     // FACTORY
     Common::Factory::Factory::getInstance().preInit();
     Common::Factory::Factory::getInstance().createObjects();
+    Common::Factory::Factory::getInstance().postInit();
 
     auto ctrl = FACTORY.getControlIf("control_0");
     ctrl->postInit();

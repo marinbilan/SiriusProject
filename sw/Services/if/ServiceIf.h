@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
+#include <memory.h>
 #include "CommonTypes.h"
+#include "Database.h"
 #include "Log.h"
 
 namespace Service
@@ -19,6 +21,9 @@ public:
 
 	virtual void preInit() {};
 	virtual void postInit() {};
+
+	// Thread Manager
+	virtual void startAllThreads() {};
 
     // cmd handling
 	virtual void dump() {};

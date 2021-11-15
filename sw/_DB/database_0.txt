@@ -2,43 +2,48 @@
 
 /---------------------------------------------------------------
  |  0th STAGE of creation
- |  INTERFACEs
- |                    [0th stage] ServiceIf
+ |  INTERFACEs - Example of ServiceIf
+ |  Every Interface contains one tree of objects
+ |
+ |  [Interfaces]                 ServiceIf
  |                                   |
  |                 ----------------------------------    
  |                 |                 |              |
- |  [1th stage] Service0          Service1       Service2 
- |
- |  [2nd stage] Service::Service0
- |              service0_0
- |              service0_1
+ |  [If Tag]    Service0          Service1       Service2 
+ |  [Construct] Service::Service0 // Constructor
+ |  [Instances] ----
+ |              service0_0 // First object
+ |              service0_1 // Second Object
  |              ...
 ---------------------------------------------------------------/
+========================== INTERFACES ==========================
 Interfaces    string    controls ServiceIf ActiveObjectIf
 
 
 ========================== DERIVED CLASSES =====================
 /---------------------------------------------------------------
  |  1st STAGE of derived classes creation - 
- |  DERIVED CLASSES FROM INTERFACEs
+ |  DERIVED CLASSES FROM INTERFACEs - This is just tag
 ---------------------------------------------------------------/
 controls       string    control
-ServiceIf      string    Service0
+ServiceIf      string    Service0 ThreadManager
 ActiveObjectIf string    ActivationQueue Scheduler Servant Proxy
+
 
 /---------------------------------------------------------------
  |  2st STAGE of derived classes creation 
  |  CONSTRUCTORs NAMES AND INSTANCEs NAMES
 ---------------------------------------------------------------/
 [CONTROLS]
-controls_control_constructorName    string    Control::Control
-controls_control_instanceNames      string    control_0
-
+controls_control_constructorName           string    Control::Control
+controls_control_instanceNames             string    control_0
 
 [SERVICES]
-ServiceIf_Service0_constructorName    string    Service::Service0
-ServiceIf_Service0_instanceNames      string    service0_0
+ServiceIf_Service0_constructorName         string    Service::Service0
+ServiceIf_Service0_instanceNames           string    service0_0 service1_0 service1_1
 
+ServiceIf_ThreadManager_constructorName    string    Service::ThreadManager
+ServiceIf_ThreadManager_instanceNames      string    threadManager_0
 
 [ACTIVE OBJECT]
 // ActivationQueue
@@ -50,22 +55,27 @@ ActiveObjectIf_Scheduler_constructorName    string     ActiveObject::Scheduler
 ActiveObjectIf_Scheduler_instanceNames      string     scheduler_0
 
 // Servant
-ActiveObjectIf_Servant_constructorName    string     ActiveObject::Servant
-ActiveObjectIf_Servant_instanceNames      string     servant_0
+ActiveObjectIf_Servant_constructorName      string     ActiveObject::Servant
+ActiveObjectIf_Servant_instanceNames        string     servant_0
 
 // Proxy
-ActiveObjectIf_Proxy_constructorName    string     ActiveObject::Proxy
-ActiveObjectIf_Proxy_instanceNames      string     proxy_0
+ActiveObjectIf_Proxy_constructorName        string     ActiveObject::Proxy
+ActiveObjectIf_Proxy_instanceNames          string     proxy_0
 
 
 /---------------------------------------------------------------
  |  INSTANCEs
 ---------------------------------------------------------------/
+// [SERVICES Instances]
+ServiceIf_Service0_service0_0_childrenInstances         string    service1_0 service1_1
+
+ServiceIf_ThreadManager_threadManager_0_scheduler       string    scheduler_0
+
 // ActivationQueue
 
 // Scheduler
 ActiveObjectIf_Scheduler_scheduler_0_activationQueue    string    activationQueue_0 
 
 // Proxy
-ActiveObjectIf_Proxy_proxy_0_scheduler    string    scheduler_0 
-ActiveObjectIf_Proxy_proxy_0_servant      string    servant_0 
+ActiveObjectIf_Proxy_proxy_0_scheduler    string        scheduler_0 
+ActiveObjectIf_Proxy_proxy_0_servant      string        servant_0 

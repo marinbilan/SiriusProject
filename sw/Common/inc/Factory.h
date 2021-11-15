@@ -4,6 +4,8 @@
 #include <iostream>  
 #include <memory>  
 #include <vector>  
+#include <functional>
+#include <optional>
 
 // Common
 #include "Database.h"
@@ -11,8 +13,12 @@
 
 #include "ControlIf.h"
 #include "Control.h"
+
+// Services
 #include "ServiceIf.h"
 #include "Service0.h"
+#include "ThreadManager.h"
+
 // Active Object
 #include "ActiveObjectIf.h"
 #include "ActivationQueue.h"
@@ -20,30 +26,26 @@
 #include "Servant.h"
 #include "Proxy.h"
 
-// Map in class members (ClassName, constructorPtr(const str&, const str&))
-// Register class in map with registerClass method
+/*
+*	[PREPARATION STEP : 2]
+*		Object Registration
+*		- Register class calling registerClass method (ClassName, constructorPtr(const str&, const str&))
+*		- Register class in map with registerClass method
+*/
 #define REGISTER_CLASS(ConstructorName) Common::Factory::getInstance().registerClass<ConstructorName>(#ConstructorName)
 
-/*
-Factory:
-[1st STEP]
-Class Registration
-- Class registration (insert constructor pointer in map)
-
-[2nd STEP]
-Object Creation
-- Create object out of map (find in map and create instance)
-*/
 
 namespace Common
 {
-/*! @brief  Method for object construction
-*   @param  objectName Name (ID) of particaular instance
-*   @return void pointer on particular created object
-*/
-// Constructor type (const str&, const str&)
-// arg0 - instanceDbPath (without instance name)
-// arg1 - instanceName
+	/*! @brief 
+	*	[CREATION STEP : 2] Method for object construction
+	*		- Construct instance out of template constructor
+	*
+	*	@param arg0 instanceDbPath (without instance name)
+	*	@param arg1 instanceName
+	*
+	*   @return void ponter of created object
+	*/
 template <class T> void* constructorNew(const std::string& arg0, const std::string& arg1)
 {
 	return (void*)new T(arg0, arg1);
@@ -57,60 +59,114 @@ public:
 	*/
 	static Factory& getInstance()
 	{
+		// std::cout << "This is constructor!" << '\n';
 		static Factory instance;
 		return instance;
 	}
 
-	~Factory() {};
+	~Factory() 
+	{
+		std::cout << "Factory destructor called!" << '\n';
+	};
 
 	Factory(Factory const&) = delete;
 	void operator=(Factory const&) = delete;
 
-	/*! @brief Method for class registration - map(constructor name, constructor (function) pointer)
-	*   @param constructorName Namespace::constructorName
+	// ==== PREPARATION PHASE START ====
+	/*! @brief  
+	*	[PREPARATION STEP : 1] Register class using MACRO - Generator of objects	
+	*		- Class registration (register constructor name calling MACRO)
+	*
+    *	@return void
+	*/
+	void registerClass()
+	{
+		// Services
+		REGISTER_CLASS(Control::Control);
+		REGISTER_CLASS(Service::Service0);
+		REGISTER_CLASS(Service::ThreadManager);
+		// Active Object
+		REGISTER_CLASS(ActiveObject::ActivationQueue);
+		REGISTER_CLASS(ActiveObject::Scheduler);
+		REGISTER_CLASS(ActiveObject::Servant);
+		REGISTER_CLASS(ActiveObject::Proxy);
+	}
+
+	//	[PREPARATION STEP : 2] - Object registration (See MACRO above)
+
+	/*! @brief
+	*	[PREPARATION STEP : 3] Last preparation step (after this step see constructObject method)
+	*		Method for class registration - map(constructor name, constructor (template function) pointer)
+	*		For now, construction pointer is template - will be filled when constructObject method is invoked
+	*
+	*	@param	constructor name - to create pair
+	*
 	*   @return void
 	*/
-	// - ConstructorName (ex: Model::StaticModel) 
 	template <class T>
 	void registerClass(std::string const& constructorName)
 	{
+		// First argument is constructor name
+		// Second argument is classConstructorPointer (&constructorNew<T>) it is generic pointer to generic class constructor
+		// Store this pair into m_classesMap
 		m_classesMap.insert(std::make_pair(constructorName, &constructorNew<T>));
 	}
-	/*! @brief Method for object creation
-	*   @param constructorName Namespace::constructorName
-	*   @param arg0 object name
-	*   @return void
+	// ==== PREPARATION PHASE END ====
+
+
+	// ==== CREATION PHASE START ====
+	/*! @brief 
+	*	[CREATION STEP : 1] Object creation step
+	*	
+	*   @param Namespace::constructorName - to find pair in m_classesMap
+	*   @param arg0 instanceDbPath        - this is first argument in object constructor
+	*							          - for getting stuff from db, related to instance
+	*	@param arg1 instance name
+	*
+	*   @return void ponter of created object
 	*/
-	// - Find constructor pointer with constructorName and create object using that constructor pointer
 	void* constructObject(std::string const& constructorName, const std::string& arg0, const std::string& arg1)
 	{
 		mapTypeNew::iterator i = m_classesMap.find(constructorName);
+
 		if (i == m_classesMap.end()) return 0; // or throw or whatever you want  
+
 		return i->second(arg0, arg1);
 	}
+
 
 	void preInit()
 	{
         std::cout << "Factory preinit method called!" << '\n';
 
-		// DATABASE - Create DB and store it in Factory
+		// 1] DATABASE - Create DB and store it in Factory
 		std::unique_ptr<Common::Database> database = std::make_unique<Common::Database>("../sw/_DB/database_0.txt");
 		Common::Factory::getInstance().setDatabase(database);
 
 		// Create global Error object
 		// m_error = std::make_unique<Common::Error>();
 
-		// Create global Log object
+		// 2] Create global Log object
 		m_log = std::make_unique<Common::Log>("log_0");
 
+		// 3] Register all classes using REGISTER_CLASS macro
 		registerClass();
 	}
 
-
 	void postInit()
 	{
+		// Services
+		for(auto s : m_vecOfServiceIf)
+		{
+			s->postInit();
+		}
+		
+		// Active Object
+		for(auto s : m_vecOfActiveObjectIf)
+		{
+			s->postInit();
+		}
 	}
-
 
 	/*! @brief  Set database object created from init object (during init phase)
 	*   @param  database
@@ -150,31 +206,16 @@ public:
 	}
 
 
-	/*! @brief  Register class using MACRO - Generator of objects
-     *  @return void
-     */
-	void registerClass()
-	{
-		// STEP: 1 - #include derived class
-		REGISTER_CLASS(Control::Control);
-		REGISTER_CLASS(Service::Service0);
-		// Active Object
-		REGISTER_CLASS(ActiveObject::ActivationQueue);
-		REGISTER_CLASS(ActiveObject::Scheduler);
-		REGISTER_CLASS(ActiveObject::Servant);
-		REGISTER_CLASS(ActiveObject::Proxy);
-	}
-
-
 	/*! @brief  Create objects from DB
+	[CREATION STEP : 1]
 	 *  @return void
 	 */
 	void createObjects()
 	{
-		std::cout << " [CREATING OBJECTs] ";
+		getLog()->LOGFILE(LOG "[FACTORY] CREATING OBJECTs");
 		createAllObjects();
 
-		std::cout << '\n';
+		// std::cout << '\n';
 	}
 
 
@@ -184,7 +225,7 @@ public:
 		std::vector<std::string> vecOfInterfacesStrings;
 
         // INTERFACEs
-		// [0th DB Stage]: interfaces    string  ServiceIf ...
+		// [0th DB Stage]: Interfaces    string  ServiceIf ...
         m_database->getStringsFromDB(interfaces, vecOfInterfacesStrings);
 
 		for (auto s : vecOfInterfacesStrings)
@@ -193,23 +234,37 @@ public:
 		}
 	}
 
+	/*
+	Interfaces <- STARTing tags
+		ServiceIf    (vecOfInterfacesStrings)
+			Service0    (vecOfConstructorsStrings)
+							(vecOfInstanceString)
+				service0_0
+				service1_0
+				...
+	*/
+
 	void createModels(const std::string& interface)
-	{   
-		std::string interfacePath = interface;
-		std::vector<std::string> vecOfModelsStrings;
+	{
+	    getLog()->LOGFILE(LOG "[FACTORY] Interface : " + interface);
+
+		std::string interfacePath = interface;    // ServiceIf ...
+		std::vector<std::string> vecOfConstructorsStrings;
 
         // DERIVED CLASSEs
-		// [1th DB Stage]: controls    string       Service0 ...
-        m_database->getStringsFromDB(interfacePath, vecOfModelsStrings);
+		// [1th DB Stage]: ServiceIf    string      Service0, Service1 ...
+        m_database->getStringsFromDB(interfacePath, vecOfConstructorsStrings);
 
-		for (auto s : vecOfModelsStrings)
+		for (auto s : vecOfConstructorsStrings)
 		{
-			// For Constructor (1st argument): "ServiceIf_Service0_"
+			getLog()->LOGFILE(LOG "[FACTORY] Constructor : " + s);
+
+			// For Constructor (1st argument): "ServiceIf_Service0_" - Just DB path for each instance
 			std::string instanceDbPath = interfacePath + "_" + s + "_"; // arg0 of constructor - Instance dB locator
 
 			std::string constructorNameDbPath = interfacePath + "_" + s + "_" + "constructorName";
 			std::vector<std::string> vecOfConstructorString;
-			// For Constructor pointers map - vecOfConstructorString[0]: "Service::Service0"
+			// For Constructor pointers map (2nd arg) - vecOfConstructorString[0]: "Service::Service0"
             m_database->getStringsFromDB(constructorNameDbPath, vecOfConstructorString);
 
 			std::string instanceNameDbPath = interfacePath + "_" + s + "_" + "instanceNames";
@@ -217,11 +272,11 @@ public:
 			// ex vecOfInstanceString: "service0_0"
             m_database->getStringsFromDB(instanceNameDbPath, vecOfInstanceString);
 
-			// Create each instance
-			// ex: control_0 ...
+			// Create each instance and store in container with pointer on instance interface
+			// ex: service0_0, service0_1 ...
 			for (auto s : vecOfInstanceString)
 			{
-				// STEP: 2
+				// STEP: 2 - If new interface needs to be added, add it here
 				if (!interfacePath.compare("controls"))
 				{
 					std::shared_ptr<Control::ControlIf> controlInstance((Control::ControlIf*)constructObject(vecOfConstructorString[0], instanceDbPath, s));
@@ -232,6 +287,8 @@ public:
 				}
 				if (!interfacePath.compare("ServiceIf"))
 				{
+					getLog()->LOGFILE(LOG "[FACTORY] Creating Instance : " + s);
+
 					std::shared_ptr<Service::ServiceIf> serviceInstance((Service::ServiceIf*)constructObject(vecOfConstructorString[0], instanceDbPath, s));
 					serviceInstance->preInit();
 
@@ -339,8 +396,8 @@ public:
 	 *  @param - derivedObject
 	 *  @return void
 	 */
-	// -- Get Controls via Interface --
 	// STEP: 4
+	// -- Get vector of instances via Interface --
 	std::vector<std::shared_ptr<Control::ControlIf>>& getControlIfVec()
 	{
 		return m_vecOfControlIf;
@@ -357,15 +414,30 @@ public:
 	}
 
 	// STEP: 5
+	// -- Get instance via Interface --
 	std::shared_ptr<Control::ControlIf>& getControlIf(const std::string& arg0)
 	{
 		return getObjectFromVec(m_vecOfControlIf, arg0);
 	}
 
-	std::shared_ptr<Service::ServiceIf>& getServiceIf(const std::string& arg0)
+
+	std::optional<std::shared_ptr<Service::ServiceIf>> getServiceIf(const std::string& arg0)
 	{
-		return getObjectFromVec(m_vecOfServiceIf, arg0);
+		getLog()->LOGFILE(LOG "Try to get ServiceIf instance: " + arg0);
+
+		for (auto it = m_vecOfServiceIf.begin(); it != m_vecOfServiceIf.end(); ++it)
+		{
+			if (!(*it)->getName().compare(arg0))
+			{
+				return *it;
+			}
+		}
+
+		getLog()->LOGFILE(LOG "No instance: " + arg0 + " in m_vecOfServiceIf. Return optional");
+
+		return {};
 	}
+
 
 	std::shared_ptr<ActiveObject::ActiveObjectIf>& getActiveObjectIf(const std::string& arg0)
 	{
@@ -385,8 +457,9 @@ public:
 			}
 		}
 
-		// If not found, return something
-		std::cout << " NOT FOUND: " << arg1 << " Returning: " << vec0[0]->getName() << '\n';
+		// If not found, return nullptr
+		// std::cout << " NOT FOUND: " << arg1 << " Returning: " << vec0[0]->getName() << '\n';
+	
 		return vec0[0];
 	}
 
